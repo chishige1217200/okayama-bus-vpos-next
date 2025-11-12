@@ -1,0 +1,26 @@
+[
+  {
+    "id": "vehicle_926_292022009_20251001",
+    "vehicle": {
+      "trip": {
+        "tripId": "926_292022009_20251001",
+        "startTime": "22:35:00",
+        "startDate": "20251112",
+        "routeId": "25003_538_1"
+      },
+      "position": {
+        "latitude": 34.491973876953125,
+        "longitude": 133.94549560546875,
+        "speed": 2.222222328186035
+      },
+      "currentStopSequence": 14,
+      "timestamp": "1762958073",
+      "stopId": "390_1",
+      "vehicle": {
+        "id": "115",
+        "label": "F0615"
+      },
+      "occupancyStatus": "MANY_SEATS_AVAILABLE"
+    }
+  }
+]
