@@ -1,12 +1,10 @@
+import { Trip } from "./trip";
+import { Vehicle } from "./vehicle";
+
 export interface VposUpdate {
   id: string;
   vehicle: {
-    trip: {
-      tripId: string;
-      startTime: string;
-      startDate: string;
-      routeId: string;
-    };
+    trip: Trip;
     position: {
       latitude: number;
       longitude: number;
@@ -15,6 +13,7 @@ export interface VposUpdate {
     currentStopSequence: number;
     timestamp: string;
     stopId: string;
-    vehicle: { id: string; label: string };
+    vehicle: Vehicle;
+    occupancyStatus: string;
   };
 }

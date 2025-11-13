@@ -16,7 +16,12 @@ export const fetchData = async (source: string) => {
     const FeedMessage = root.lookupType("transit_realtime.FeedMessage");
 
     // データの取得
-    const binaryData = await (await fetch(source))
+    const res = await fetch(source);
+    if (!res.ok) {
+      console.error(`Error fetching data: ${res.status} ${res.statusText}`);
+      throw new Error(`Error fetching data: ${res.status} ${res.statusText}`);
+    }
+    const binaryData = await res
       .arrayBuffer()
       .then((res) => new Uint8Array(res));
 
@@ -31,7 +36,7 @@ export const fetchData = async (source: string) => {
     // console.log("Parsed Data Array:", JSON.stringify(parsedArray, null, 2));
     return parsedArray ?? [];
   } catch (error) {
-    console.error("Error parsing data:", error);
-    return [];
+    console.error("Error in fetchData: ", error);
+    throw error;
   }
 };
