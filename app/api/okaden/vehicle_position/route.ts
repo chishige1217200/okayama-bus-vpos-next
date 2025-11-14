@@ -1,5 +1,5 @@
 import { fetchData } from "@/lib/busVisionApi";
-import { ApiErrorResponse } from "@/types/ApiErrorResponse";
+import { ApiErrorResponse } from "@/types/apiErrorResponse";
 import { VposUpdate } from "@/types/vposUpdate";
 import { NextResponse } from "next/server";
 
