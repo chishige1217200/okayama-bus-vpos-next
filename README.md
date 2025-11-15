@@ -4,7 +4,6 @@
 対象事業者
 - 両備バス：https://www.ryobi-holdings.jp/bus/
 - 岡電バス：https://www.okayama-kido.co.jp/bus/
-- 路面電車：https://www.okayama-kido.co.jp/tramway/
 - 八晃運輸：https://megurin-okayama.com/
 
 ---
