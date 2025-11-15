@@ -1,0 +1,4 @@
+"fare_id","price","currency_type","payment_method","transfers","transfer_duration"
+"5_1_200_20250915","200","JPY","0","0",
+"5_2_200_20250915","200","JPY","0","0",
+"5_2_300_20250915","300","JPY","0","0",

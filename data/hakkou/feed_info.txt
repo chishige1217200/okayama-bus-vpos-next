@@ -1,0 +1,2 @@
+"feed_publisher_name","feed_publisher_url","feed_lang","feed_start_date","feed_end_date","feed_version"
+"八晃運輸","https://megurin-okayama.com/","ja","20250915","20260419","20250915_20251115"

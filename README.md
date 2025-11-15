@@ -1,3 +1,15 @@
+# okayama-bus-vpos-next
+本リポジトリには、[Bus-Vision](https://loc.bus-vision.jp/ryobi/view/opendata.html)で使用されているオープンデータが一部含まれています。
+
+対象事業者
+- 両備バス：https://www.ryobi-holdings.jp/bus/
+- 岡電バス：https://www.okayama-kido.co.jp/bus/
+- 中鉄バス：http://www.chutetsu-bus.co.jp/
+- 路面電車：https://www.okayama-kido.co.jp/tramway/
+- 八晃運輸：https://megurin-okayama.com/
+
+---
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
