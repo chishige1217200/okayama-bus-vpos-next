@@ -1,4 +1,4 @@
-"label","file_name"
+"label","url"
 "F0112","https://loc.bus-vision.jp/ryobi/view/images/common/busicon/10000/3/202_s.png"
 "F0113","https://loc.bus-vision.jp/ryobi/view/images/common/busicon/10000/3/202_s.png"
 "F0115","https://loc.bus-vision.jp/ryobi/view/images/common/busicon/10000/3/202_s.png"
@@ -96,4 +96,3 @@
 "Y2101","https://loc.bus-vision.jp/ryobi/view/images/common/busicon/10000/3/214_s.png"
 "Y2102","https://loc.bus-vision.jp/ryobi/view/images/common/busicon/10000/3/215_s.png"
 "F1720","https://loc.bus-vision.jp/ryobi/view/images/common/busicon/10000/3/216_s.png"
-"DEFAULT","/202_r.png"
