@@ -1,11 +1,11 @@
 import { ApiErrorResponse } from "@/types/apiErrorResponse";
-import { TripUpdate } from "@/types/tripUpdate";
+import { Routes } from "@/types/gtfsFeed";
 import { NextRequest, NextResponse } from "next/server";
 
 // GET /api/get_routes/
 export async function GET(
   request: NextRequest
-): Promise<NextResponse<TripUpdate[] | ApiErrorResponse>> {
+): Promise<NextResponse<Routes[] | ApiErrorResponse>> {
   try {
     const searchParams = request.nextUrl.searchParams;
     const query = searchParams.get("agency");
@@ -18,11 +18,8 @@ export async function GET(
       return NextResponse.json(apiErrorResponse, { status: 400 });
     }
 
-    // TODO: 修正が必要
-    return NextResponse.json(
-      [],
-      { status: 200 }
-    );
+    // TODO: 実装
+    return NextResponse.json([], { status: 200 });
   } catch (error: unknown) {
     if (error instanceof Error) {
       const apiErrorResponse: ApiErrorResponse = {
