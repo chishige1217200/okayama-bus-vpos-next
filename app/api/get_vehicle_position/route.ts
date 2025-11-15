@@ -4,7 +4,7 @@ import { ApiErrorResponse } from "@/types/apiErrorResponse";
 import { VposUpdate } from "@/types/vposUpdate";
 import { NextRequest, NextResponse } from "next/server";
 
-// GET /api/vehicle_position/
+// GET /api/get_vehicle_position/
 export async function GET(
   request: NextRequest
 ): Promise<NextResponse<VposUpdate[] | ApiErrorResponse>> {

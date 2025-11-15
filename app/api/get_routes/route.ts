@@ -1,10 +1,8 @@
-import { fetchData } from "@/lib/busVisionApi";
-import { Agency, getTripUpdateUrl } from "@/types/agency";
 import { ApiErrorResponse } from "@/types/apiErrorResponse";
 import { TripUpdate } from "@/types/tripUpdate";
 import { NextRequest, NextResponse } from "next/server";
 
-// GET /api/trip_update/
+// GET /api/get_routes/
 export async function GET(
   request: NextRequest
 ): Promise<NextResponse<TripUpdate[] | ApiErrorResponse>> {
@@ -20,8 +18,9 @@ export async function GET(
       return NextResponse.json(apiErrorResponse, { status: 400 });
     }
 
+    // TODO: 修正が必要
     return NextResponse.json(
-      await fetchData(getTripUpdateUrl(query as Agency)),
+      [],
       { status: 200 }
     );
   } catch (error: unknown) {
