@@ -1,5 +1,5 @@
 # okayama-bus-vpos-next
-本リポジトリには、[Bus-Vision](https://loc.bus-vision.jp/ryobi/view/opendata.html)で使用されているオープンデータが一部含まれています。
+本リポジトリには、[Bus-Vision](https://loc.bus-vision.jp/ryobi/view/opendata.html)より提供されているオープンデータが含まれています。
 
 対象事業者
 - 両備バス：https://www.ryobi-holdings.jp/bus/
