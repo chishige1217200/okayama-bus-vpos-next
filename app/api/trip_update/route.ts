@@ -1,17 +1,27 @@
 import { fetchData } from "@/lib/busVisionApi";
+import { Agency, getTripUpdateUrl } from "@/types/agency";
 import { ApiErrorResponse } from "@/types/apiErrorResponse";
 import { TripUpdate } from "@/types/tripUpdate";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-// GET /api/hakkou/trip_update/
-export async function GET(): Promise<
-  NextResponse<TripUpdate[] | ApiErrorResponse>
-> {
+// GET /api/trip_update/
+export async function GET(
+  request: NextRequest
+): Promise<NextResponse<TripUpdate[] | ApiErrorResponse>> {
   try {
+    const searchParams = request.nextUrl.searchParams;
+    const query = searchParams.get("agency");
+
+    if (!query) {
+      const apiErrorResponse: ApiErrorResponse = {
+        error: "Agency parameter is required",
+        status: 400,
+      };
+      return NextResponse.json(apiErrorResponse, { status: 400 });
+    }
+
     return NextResponse.json(
-      await fetchData(
-        "https://loc.bus-vision.jp/realtime/hakkou_trip_update_v2.bin"
-      ),
+      await fetchData(getTripUpdateUrl(query as Agency)),
       { status: 200 }
     );
   } catch (error: unknown) {
