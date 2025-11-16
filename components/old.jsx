@@ -239,7 +239,7 @@ const Old = () => {
                   }}
                   onCloseClick={() => setActiveMarkerId(null)} // 閉じるときにリセット
                 >
-                  <div>
+                  <div className="text-black">
                     <h4 style={{ textAlign: "center" }}>{marker.title}</h4>
                     <p style={{ textAlign: "center" }}>
                       {marker.label}号車
