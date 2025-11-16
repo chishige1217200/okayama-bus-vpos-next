@@ -1,6 +1,7 @@
 "use server";
 import { Agency } from "@/types/agency";
 import { Routes } from "@/types/gtfsFeed";
+import { parse } from "csv-parse/sync";
 import fs from "fs";
 import path from "path";
 
@@ -17,7 +18,19 @@ const getRoutesPath = (agency: Agency): string => {
   }
 };
 
-export const getRoutes = (agency: Agency): Routes[] => {
-  // TODO: 実装
-  return [];
+export const getRoutes = async (agency: Agency): Promise<Routes[]> => {
+  try {
+    const csvText = fs.readFileSync(getRoutesPath(agency), "utf-8");
+
+    const records = parse(csvText, {
+      columns: true, // 1行目をオブジェクトのキーとして使う
+      skip_empty_lines: true,
+      trim: true, // 前後の空白削除
+    });
+
+    return records as Routes[];
+  } catch (error) {
+    console.error("Error reading routes file:", error);
+    throw error;
+  }
 };

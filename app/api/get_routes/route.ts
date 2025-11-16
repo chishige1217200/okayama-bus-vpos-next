@@ -1,3 +1,5 @@
+import { getRoutes } from "@/lib/gtfsFeedApi";
+import { Agency } from "@/types/agency";
 import { ApiErrorResponse } from "@/types/apiErrorResponse";
 import { Routes } from "@/types/gtfsFeed";
 import { NextRequest, NextResponse } from "next/server";
@@ -18,8 +20,7 @@ export async function GET(
       return NextResponse.json(apiErrorResponse, { status: 400 });
     }
 
-    // TODO: 実装
-    return NextResponse.json([], { status: 200 });
+    return NextResponse.json(await getRoutes(query as Agency), { status: 200 });
   } catch (error: unknown) {
     if (error instanceof Error) {
       const apiErrorResponse: ApiErrorResponse = {
