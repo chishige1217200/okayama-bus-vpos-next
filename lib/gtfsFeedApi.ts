@@ -20,7 +20,19 @@ const getRoutesPath = (agency: Agency): string => {
 
 export const getRoutes = async (agency: Agency): Promise<Routes[]> => {
   try {
-    const csvText = fs.readFileSync(getRoutesPath(agency), "utf-8");
+    const filePath = getRoutesPath(agency);
+
+    // ファイルパスが無効な場合は空配列を返す
+    if (!filePath) {
+      return [];
+    }
+
+    // ファイルが存在しない場合は空配列を返す
+    if (!fs.existsSync(filePath)) {
+      return [];
+    }
+
+    const csvText = fs.readFileSync(filePath, "utf-8");
 
     const records = parse(csvText, {
       columns: true, // 1行目をオブジェクトのキーとして使う
@@ -30,7 +42,7 @@ export const getRoutes = async (agency: Agency): Promise<Routes[]> => {
 
     return records as Routes[];
   } catch (error) {
-    console.error("Error reading routes file:", error);
+    console.error("Error in getRoutes: ", error);
     throw error;
   }
 };
