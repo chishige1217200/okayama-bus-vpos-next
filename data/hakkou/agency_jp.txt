@@ -1,0 +1,2 @@
+"agency_id","agency_official_name","agency_zip_number","agency_address","agency_president_pos","agency_president_name"
+"5260001005389","八晃運輸","7038263","岡山市中区倉益363-2","代表取締役","成石敏昭"

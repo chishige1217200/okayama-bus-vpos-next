@@ -1,0 +1,188 @@
+[
+  {
+    "id": "tripUpdate_926_292022009_20251001",
+    "tripUpdate": {
+      "trip": {
+        "tripId": "926_292022009_20251001",
+        "startTime": "22:35:00",
+        "startDate": "20251112",
+        "routeId": "25003_538_1"
+      },
+      "stopTimeUpdate": [
+        {
+          "stopSequence": 1,
+          "arrival": {
+            "delay": 10,
+            "uncertainty": 0
+          },
+          "departure": {
+            "delay": 10,
+            "uncertainty": 0
+          },
+          "stopId": "18_3"
+        },
+        {
+          "stopSequence": 2,
+          "arrival": {
+            "delay": 158,
+            "uncertainty": 0
+          },
+          "departure": {
+            "delay": 158,
+            "uncertainty": 0
+          },
+          "stopId": "19_5"
+        },
+        {
+          "stopSequence": 3,
+          "arrival": {
+            "delay": 22,
+            "uncertainty": 0
+          },
+          "departure": {
+            "delay": 22,
+            "uncertainty": 0
+          },
+          "stopId": "27_11"
+        },
+        {
+          "stopSequence": 5,
+          "arrival": {
+            "delay": 268,
+            "uncertainty": 0
+          },
+          "departure": {
+            "delay": 268,
+            "uncertainty": 0
+          },
+          "stopId": "105_2"
+        },
+        {
+          "stopSequence": 6,
+          "arrival": {
+            "delay": 342,
+            "uncertainty": 0
+          },
+          "departure": {
+            "delay": 342,
+            "uncertainty": 0
+          },
+          "stopId": "405_2"
+        },
+        {
+          "stopSequence": 7,
+          "arrival": {
+            "delay": 415,
+            "uncertainty": 0
+          },
+          "departure": {
+            "delay": 415,
+            "uncertainty": 0
+          },
+          "stopId": "469_2"
+        },
+        {
+          "stopSequence": 8,
+          "arrival": {
+            "delay": 461,
+            "uncertainty": 0
+          },
+          "departure": {
+            "delay": 461,
+            "uncertainty": 0
+          },
+          "stopId": "470_2"
+        },
+        {
+          "stopSequence": 9,
+          "arrival": {
+            "delay": 521,
+            "uncertainty": 0
+          },
+          "departure": {
+            "delay": 521,
+            "uncertainty": 0
+          },
+          "stopId": "1004_3"
+        },
+        {
+          "stopSequence": 10,
+          "arrival": {
+            "delay": 571,
+            "uncertainty": 0
+          },
+          "departure": {
+            "delay": 571,
+            "uncertainty": 0
+          },
+          "stopId": "373_2"
+        },
+        {
+          "stopSequence": 11,
+          "arrival": {
+            "delay": 585,
+            "uncertainty": 0
+          },
+          "departure": {
+            "delay": 585,
+            "uncertainty": 0
+          },
+          "stopId": "375_2"
+        },
+        {
+          "stopSequence": 12,
+          "arrival": {
+            "delay": 481,
+            "uncertainty": 0
+          },
+          "departure": {
+            "delay": 481,
+            "uncertainty": 0
+          },
+          "stopId": "218_3"
+        },
+        {
+          "stopSequence": 13,
+          "arrival": {
+            "delay": 504,
+            "uncertainty": 0
+          },
+          "departure": {
+            "delay": 504,
+            "uncertainty": 0
+          },
+          "stopId": "374_1"
+        },
+        {
+          "stopSequence": 14,
+          "arrival": {
+            "delay": 514,
+            "uncertainty": 0
+          },
+          "departure": {
+            "delay": 514,
+            "uncertainty": 0
+          },
+          "stopId": "390_1"
+        },
+        {
+          "stopSequence": 15,
+          "arrival": {
+            "delay": 514,
+            "uncertainty": 300
+          },
+          "departure": {
+            "delay": 514,
+            "uncertainty": 300
+          },
+          "stopId": "471_2"
+        }
+      ],
+      "vehicle": {
+        "id": "115",
+        "label": "F0615"
+      },
+      "timestamp": "1762958073"
+    }
+  }
+]

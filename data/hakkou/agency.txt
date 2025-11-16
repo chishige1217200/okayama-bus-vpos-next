@@ -1,0 +1,2 @@
+"agency_id","agency_name","agency_url","agency_timezone","agency_lang","agency_phone","agency_fare_url"
+"5260001005389","八晃運輸","https://megurin-okayama.com/","Asia/Tokyo","ja","0862963277",
