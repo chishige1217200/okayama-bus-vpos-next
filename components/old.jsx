@@ -8,7 +8,7 @@ import {
   MarkerF,
   OverlayView,
 } from "@react-google-maps/api";
-import "./main.css";
+import "./old.css";
 
 const containerStyle = {
   height: "100vh",
@@ -181,7 +181,10 @@ const Old = () => {
             color: "white",
           }}
         >
-          <button className="google-style-btn text-black" onClick={() => fetchMarkers()}>
+          <button
+            className="google-style-btn text-black"
+            onClick={() => fetchMarkers()}
+          >
             更新
           </button>
         </div>
@@ -240,32 +243,35 @@ const Old = () => {
                   onCloseClick={() => setActiveMarkerId(null)} // 閉じるときにリセット
                 >
                   <div className="text-black">
-                    <h4 style={{ textAlign: "center" }}>{marker.title}</h4>
-                    <p style={{ textAlign: "center" }}>
-                      {marker.label}号車
-                      <br />
-                      <b>次は {marker.nextStopName}</b>
-                      <br />
-                      {marker.delay !== undefined && marker.delay !== null
-                        ? marker.delay > 0
-                          ? "約" + marker.delay + "分遅れ"
-                          : "ほぼ定刻"
-                        : "遅れ情報が取得できません"}
-                      <br />
-                      {marker.occupancyStatus}
-                      <br />
-                      <a
-                        href={
-                          "https://loc.bus-vision.jp/ryobi/view/vehicleState.html?vehicleCorpCd=3&vehicleCd=" +
-                          marker.id +
-                          "&lang=0"
-                        } // 両備バス以外はvehicleCorpCdが違う
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        詳しい運行状況
-                      </a>
-                    </p>
+                    <div className="font-medium text-center">
+                      {marker.title}
+                    </div>
+                    <div className="text-center">
+                      <p>{marker.label}号車</p>
+                      <p className="font-medium">次は {marker.nextStopName}</p>
+                      <p>
+                        {marker.delay !== undefined && marker.delay !== null
+                          ? marker.delay > 0
+                            ? "約" + marker.delay + "分遅れ"
+                            : "ほぼ定刻"
+                          : "遅れ情報が取得できません"}
+                      </p>
+                      <p>{marker.occupancyStatus}</p>
+                      <p>
+                        <a
+                          className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+                          href={
+                            "https://loc.bus-vision.jp/ryobi/view/vehicleState.html?vehicleCorpCd=3&vehicleCd=" +
+                            marker.id +
+                            "&lang=0"
+                          } // 両備バス以外はvehicleCorpCdが違う
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          詳しい運行状況
+                        </a>
+                      </p>
+                    </div>
                   </div>
                 </InfoWindowF>
               )}
