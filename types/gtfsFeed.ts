@@ -11,6 +11,14 @@ export interface Routes {
   jp_parent_route_id: string;
 }
 
+export interface RoutesJp {
+  route_id: string;
+  route_update_date: string;
+  origin_stop: string;
+  via_stop: string;
+  destination_stop: string;
+}
+
 export interface Stops {
   stop_id: string;
   stop_code: string;
