@@ -9,6 +9,7 @@ import {
   OverlayView,
 } from "@react-google-maps/api";
 import "./old.css";
+import Link from "next/link";
 
 const containerStyle = {
   height: "100vh",
@@ -171,6 +172,37 @@ const Old = () => {
             </div>
           </div>
         )}
+        <div
+          style={{
+            position: "absolute",
+            top: 10,
+            left: "50%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            color: "white", // 文字色
+            padding: "5px 10px", // テキスト周囲に余白を確保
+            borderRadius: "5px", // 枠を角丸にする
+            transform: "translateX(-50%)",
+            zIndex: 5,
+          }}
+        >
+          <div className="flex-col justify-center">
+            <div className="justify-center flex">
+              <p>このページは旧システムです。</p>
+            </div>
+            <div className="justify-center flex">
+              <p>今後メンテナンスされません。</p>
+            </div>
+            <div className="justify-center flex">
+              <p className="">新システムは</p>
+              <Link
+                href="/"
+                className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+              >
+                こちら
+              </Link>
+            </div>
+          </div>
+        </div>
         <div
           style={{
             position: "absolute",
