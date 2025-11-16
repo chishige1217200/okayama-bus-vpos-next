@@ -10,3 +10,19 @@ export interface Routes {
   route_text_color: string;
   jp_parent_route_id: string;
 }
+
+export interface Stops {
+  stop_id: string;
+  stop_code: string;
+  stop_name: string;
+  stop_desc: string;
+  stop_lat: string;
+  stop_lon: string;
+  zone_id: string;
+  stop_url: string;
+  location_type: string;
+  parent_station: string;
+  stop_timezone: string;
+  wheelchair_boarding: string;
+  platform_code: string;
+}
