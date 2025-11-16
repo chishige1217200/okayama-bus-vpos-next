@@ -1,6 +1,7 @@
 "use server";
 import { Agency } from "@/types/agency";
 import { Icon } from "@/types/icon";
+import { parse } from "csv-parse/sync";
 import fs from "fs";
 import path from "path";
 
@@ -17,7 +18,31 @@ const getIconPath = (agency: Agency): string => {
   }
 };
 
-export const getIcon = (agency: Agency): Icon[] => {
-  // TODO: 実装
-  return [];
+export const getIcon = async (agency: Agency): Promise<Icon[]> => {
+  try {
+    const filePath = getIconPath(agency);
+
+    // ファイルパスが無効な場合は空配列を返す
+    if (!filePath) {
+      return [];
+    }
+
+    // ファイルが存在しない場合は空配列を返す
+    if (!fs.existsSync(filePath)) {
+      return [];
+    }
+
+    const csvText = fs.readFileSync(filePath, "utf-8");
+
+    const records = parse(csvText, {
+      columns: true, // 1行目をオブジェクトのキーとして使う
+      skip_empty_lines: true,
+      trim: true, // 前後の空白削除
+    });
+
+    return records as Icon[];
+  } catch (error) {
+    console.error("Error in getIcon: ", error);
+    throw error;
+  }
 };
