@@ -2,16 +2,21 @@
 
 import { useEffect, useState } from "react";
 import "./main.css";
-import { UserLocation } from "@/types/userLocation";
 import { GoogleMap, LoadScript, OverlayView } from "@react-google-maps/api";
 import Image from "next/image";
+import MarkerGroup from "./marker";
+import { Agency } from "@/types/agency";
 
 const Main = () => {
   // const [markers, setMarkers] = useState([]);
-  const [activeMarkerId, setActiveMarkerId] = useState(null); // 開いているInfoWindowFを追跡
+  const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null); // 開いているInfoWindowFを追跡
   // const [isLoading, setIsLoading] = useState(true); // ローディング状態
-  const [center, setCenter] = useState({ lat: 34.663, lng: 133.925 }); // 初期値
-  const [userLocation, setUserLocation] = useState<UserLocation | null>(null); // ユーザーの現在地
+  const [center, setCenter] = useState<google.maps.LatLngLiteral>({
+    lat: 34.663,
+    lng: 133.925,
+  }); // 初期値
+  const [userLocation, setUserLocation] =
+    useState<google.maps.LatLngLiteral | null>(null); // ユーザーの現在地
 
   useEffect(() => {
     console.log("Fetching user location...");
@@ -55,6 +60,7 @@ const Main = () => {
             </div>
           </OverlayView>
         )}
+        <MarkerGroup agency={Agency.RYOBI} />
         {/* {markers.map((marker) => (
             <React.Fragment key={marker.id}>
             </React.Fragment>
