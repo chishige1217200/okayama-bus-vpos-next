@@ -1,4 +1,4 @@
-import { Agency } from "@/types/agency";
+import { Agency, getVehicleStateUrl } from "@/types/agency";
 import { Routes, RoutesJp, Stops } from "@/types/gtfsFeed";
 import { Icon } from "@/types/icon";
 import { TripUpdate } from "@/types/tripUpdate";
@@ -17,46 +17,50 @@ const MarkerGroup = (props: MarkerGroupProps) => {
   const fetchTripUpdate = async (agency: Agency) => {
     const response = await fetch(`/api/get_trip_update/?agency=${agency}`);
     const data = await response.json();
-    setTripUpdate(data);
+    setTripUpdateList(data);
   };
 
   const fetchVposUpdate = async (agency: Agency) => {
     const response = await fetch(`/api/get_vehicle_position/?agency=${agency}`);
     const data = await response.json();
-    setVposUpdate(data);
+    setVposUpdateList(data);
   };
 
   const fetchRoutes = async (agency: Agency) => {
     const response = await fetch(`api/get_routes/?agency=${agency}`);
     const data = await response.json();
-    setRoutes(data);
+    setRoutesList(data);
   };
 
   const fetchRoutesJp = async (agency: Agency) => {
     const response = await fetch(`api/get_routes_jp/?agency=${agency}`);
     const data = await response.json();
-    setRoutesJp(data);
+    setRoutesJpList(data);
   };
 
   const fetchStops = async (agency: Agency) => {
     const response = await fetch(`api/get_stops/?agency=${agency}`);
     const data = await response.json();
-    setStops(data);
+    setStopsList(data);
   };
 
   const fetchIcon = async (agency: Agency) => {
     const response = await fetch(`/api/get_icon/?agency=${agency}`);
     const data = await response.json();
-    setIcon(data);
+    setIconList(data);
   };
 
   // 運行情報の状態管理
-  const [tripUpdate, setTripUpdate] = useState<TripUpdate[] | null>(null);
-  const [vposUpdate, setVposUpdate] = useState<VposUpdate[] | null>(null);
-  const [routes, setRoutes] = useState<Routes[] | null>(null);
-  const [routesJp, setRoutesJp] = useState<RoutesJp[] | null>(null);
-  const [stops, setStops] = useState<Stops[] | null>(null);
-  const [icon, setIcon] = useState<Icon[] | null>(null);
+  const [tripUpdateList, setTripUpdateList] = useState<TripUpdate[] | null>(
+    null
+  );
+  const [vposUpdateList, setVposUpdateList] = useState<VposUpdate[] | null>(
+    null
+  );
+  const [routesList, setRoutesList] = useState<Routes[] | null>(null);
+  const [routesJpList, setRoutesJpList] = useState<RoutesJp[] | null>(null);
+  const [stopsList, setStopsList] = useState<Stops[] | null>(null);
+  const [iconList, setIconList] = useState<Icon[] | null>(null);
 
   useEffect(() => {
     fetchTripUpdate(props.agency);
@@ -67,30 +71,38 @@ const MarkerGroup = (props: MarkerGroupProps) => {
     fetchIcon(props.agency);
   }, [props.agency]);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchTripUpdate(props.agency);
+      fetchVposUpdate(props.agency);
+    }, 20000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <>
-      {vposUpdate
-        ? vposUpdate.map((vpos, index) => (
+      {vposUpdateList
+        ? vposUpdateList.map((vpos, index) => (
             <React.Fragment key={vpos.vehicle.vehicle.id}>
               <Marker
+                agency={props.agency}
                 key={vpos.vehicle.vehicle.id}
                 trip={
-                  tripUpdate && vpos
-                    ? tripUpdate.filter(
+                  tripUpdateList && vpos
+                    ? tripUpdateList.find(
                         (trip) =>
                           trip.tripUpdate.vehicle.id === vpos.vehicle.vehicle.id
-                      )[0]
+                      ) ?? null
                     : null
                 }
                 vpos={vpos}
-                icon={
-                  icon && vpos
-                    ? icon?.filter(
-                        (i) => i.label === vpos.vehicle.vehicle.label
-                      )[0]
-                    : null
-                }
+                routes={routesList}
+                routesJp={routesJpList}
+                stops={stopsList}
+                icon={iconList}
                 zIndex={Number(props.agency) * 100 + index}
+                activeMarkerId={props.activeMarkerId}
               />
             </React.Fragment>
           ))
@@ -100,16 +112,21 @@ const MarkerGroup = (props: MarkerGroupProps) => {
 };
 
 type MarkerProps = {
+  agency: Agency;
   trip: TripUpdate | null;
   vpos: VposUpdate | null;
-  icon: Icon | null;
+  routes: Routes[] | null;
+  routesJp: RoutesJp[] | null;
+  stops: Stops[] | null;
+  icon: Icon[] | null;
   zIndex: number;
+  activeMarkerId: string | null;
 };
 
 // 共通のマーカーコンポーネント
 const Marker = (props: MarkerProps) => {
   const getPosition = (): google.maps.LatLngLiteral => {
-    if (props.vpos && props.vpos.vehicle && props.vpos.vehicle.position) {
+    if (props.vpos) {
       return {
         lat: props.vpos.vehicle.position.latitude,
         lng: props.vpos.vehicle.position.longitude,
@@ -118,25 +135,124 @@ const Marker = (props: MarkerProps) => {
     return { lat: 0, lng: 0 };
   };
 
-  const getTitle = (): string => {
-    if (props.trip) {
-      return "dummy";
+  const getRouteShortName = (): string => {
+    if (props.routes && props.vpos) {
+      const routes = props.routes.find(
+        (r) => r.route_id === props.vpos?.vehicle.trip.routeId
+      );
+      return routes?.route_short_name ?? "";
+    }
+    return "";
+  };
+
+  const getDestinationStopName = (): string => {
+    if (props.routesJp && props.vpos) {
+      const routesJp = props.routesJp.find(
+        (r) => r.route_id === props.vpos?.vehicle.trip.routeId
+      );
+
+      const destinationStopName = routesJp?.destination_stop ?? "";
+      return getRouteShortName().includes("特急")
+        ? `特急 ${destinationStopName}`
+        : destinationStopName;
+    }
+    return "";
+  };
+
+  const getNextStopName = (): string => {
+    if (props.stops && props.trip && props.vpos) {
+      const stopSequence =
+        props.trip.tripUpdate.stopTimeUpdate.find(
+          (s) => s.stopSequence === props.vpos?.vehicle.currentStopSequence
+        )?.stopSequence ?? null;
+
+      if (
+        stopSequence != null &&
+        stopSequence < props.trip.tripUpdate.stopTimeUpdate.length
+      ) {
+        const nextStopId =
+          props.trip?.tripUpdate.stopTimeUpdate[stopSequence].stopId;
+        if (nextStopId) {
+          return (
+            props.stops.find((s) => s.stop_id === nextStopId)?.stop_name ?? ""
+          );
+        }
+      }
+    }
+    return "";
+  };
+
+  const getLabel = (): string => {
+    if (props.vpos) {
+      return props.vpos.vehicle.vehicle.label;
+    }
+    return "";
+  };
+
+  const getDelay = (): string => {
+    let delay = null;
+    if (props.trip && props.vpos) {
+      // 現在のstopSequenceのインデックスを取得
+      const currentIndex = props.trip.tripUpdate.stopTimeUpdate.findIndex(
+        (stop) => stop.stopSequence === props.vpos?.vehicle.currentStopSequence
+      );
+
+      // 現在のインデックスが存在する場合は、現在の遅れ時分を返す
+      if (
+        currentIndex !== -1 &&
+        currentIndex < props.trip.tripUpdate.stopTimeUpdate.length
+      ) {
+        delay =
+          Math.floor(
+            props.trip.tripUpdate.stopTimeUpdate[currentIndex].arrival.delay /
+              60
+          ) ?? null; // 正常に遅れ時分が取得できない場合はnull
+      } else {
+        // インデックスが取得できない場合は、始発時点の遅れ時分を返す
+        delay =
+          Math.floor(
+            props.trip.tripUpdate.stopTimeUpdate[0].arrival.delay / 60
+          ) ?? null; // 正常に遅れ時分が取得できない場合はnull
+      }
+    }
+
+    if (delay == null) {
+      return "遅れ情報が取得できません";
+    }
+
+    if (delay === 0) {
+      return "ほぼ定刻";
+    }
+
+    return `約${delay}分遅れ`;
+  };
+
+  const getOccupancyStatus = (): string => {
+    if (props.vpos) {
+      switch (props.vpos.vehicle.occupancyStatus) {
+        case "EMPTY":
+          return "乗車率0%";
+        case "MANY_SEATS_AVAILABLE":
+          return "乗車率50%未満";
+        case "STANDING_ROOM_ONLY":
+          return "乗車率50%~80%";
+        case "FULL":
+          return "乗車率80%以上";
+        default:
+          return "乗車率取得不可";
+      }
     }
     return "";
   };
 
   const getIcon = (): string => {
-    if (props.icon) {
-      return props.icon.url;
+    if (props.icon && props.vpos) {
+      const icon = props.icon.find(
+        (icon) => icon.label === props.vpos?.vehicle.vehicle.label
+      );
+      return icon?.url ?? "/unknown.png";
     }
     return "/unknown.png";
-  };
-
-  const getDestinationStopName = (): string => {
-    if (props.trip) {
-      return "dummy";
-    }
-    return "";
   };
 
   return (
@@ -160,16 +276,13 @@ const Marker = (props: MarkerProps) => {
             zIndex: props.zIndex, // アイコンと同レベルに表示
           }}
         >
-          {/* {marker.title.includes("特急")
-            ? `特急 ${marker.destinationStopName}`
-            : marker.destinationStopName} */}
           {getDestinationStopName()}
         </div>
       </OverlayView>
       <MarkerF
         position={getPosition()}
         zIndex={props.zIndex}
-        title={getTitle()}
+        title={getRouteShortName()}
         icon={
           getIcon()
             ? {
@@ -180,44 +293,42 @@ const Marker = (props: MarkerProps) => {
         }
         // onClick={() => setActiveMarkerId(marker.id)} // マーカークリックでInfoWindowFを開く
       />
-      {/* {activeMarkerId === marker.id && (
+      {props.activeMarkerId !== props.vpos?.vehicle.vehicle.id && (
         <InfoWindowF
-          position={marker.position} // マーカー座標を指定
+          position={getPosition()} // マーカー座標を指定
           options={{
             pixelOffset: new window.google.maps.Size(0, -100), // マーカーとの相対位置を指定
           }}
-          onCloseClick={() => setActiveMarkerId(null)} // 閉じるときにリセット
+          // onCloseClick={() => setActiveMarkerId(null)} // 閉じるときにリセット
         >
-          <div>
-            <h4 style={{ textAlign: "center" }}>{marker.title}</h4>
-            <p style={{ textAlign: "center" }}>
-              {marker.label}号車
-              <br />
-              <b>次は {marker.nextStopName}</b>
-              <br />
-              {marker.delay !== undefined && marker.delay !== null
-                ? marker.delay > 0
-                  ? "約" + marker.delay + "分遅れ"
-                  : "ほぼ定刻"
-                : "遅れ情報が取得できません"}
-              <br />
-              {marker.occupancyStatus}
-              <br />
-              <a
-                href={
-                  "https://loc.bus-vision.jp/ryobi/view/vehicleState.html?vehicleCorpCd=3&vehicleCd=" +
-                  marker.id +
-                  "&lang=0"
-                } // 両備バス以外はvehicleCorpCdが違う
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                詳しい運行状況
-              </a>
-            </p>
+          <div className="text-black">
+            <div className="font-medium text-center">{getRouteShortName()}</div>
+            <div className="text-center">
+              <p>{getLabel()}号車</p>
+              <p className="font-medium">次は {getNextStopName()}</p>
+              <p>{getDelay()}</p>
+              <p>{getOccupancyStatus()}</p>
+              <p>
+                {props.vpos ? (
+                  <a
+                    className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+                    href={getVehicleStateUrl(
+                      props.agency,
+                      props.vpos.vehicle.vehicle.id
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    詳しい運行状況
+                  </a>
+                ) : (
+                  <></>
+                )}
+              </p>
+            </div>
           </div>
         </InfoWindowF>
-      )} */}
+      )}
     </>
   );
 };
