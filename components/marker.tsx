@@ -1,4 +1,6 @@
 import { Agency } from "@/types/agency";
+import { Routes, RoutesJp, Stops } from "@/types/gtfsFeed";
+import { Icon } from "@/types/icon";
 import { TripUpdate } from "@/types/tripUpdate";
 import { VposUpdate } from "@/types/vposUpdate";
 import { InfoWindowF, MarkerF, OverlayView } from "@react-google-maps/api";
@@ -7,6 +9,7 @@ import { useEffect, useState } from "react";
 
 type MarkerGroupProps = {
   agency: Agency;
+  activeMarkerId: string | null;
 };
 
 // 事業者毎に運行情報の取得を行う
@@ -23,13 +26,45 @@ const MarkerGroup = (props: MarkerGroupProps) => {
     setVposUpdate(data);
   };
 
+  const fetchRoutes = async (agency: Agency) => {
+    const response = await fetch(`api/get_routes/?agency=${agency}`);
+    const data = await response.json();
+    setRoutes(data);
+  };
+
+  const fetchRoutesJp = async (agency: Agency) => {
+    const response = await fetch(`api/get_routes_jp/?agency=${agency}`);
+    const data = await response.json();
+    setRoutesJp(data);
+  };
+
+  const fetchStops = async (agency: Agency) => {
+    const response = await fetch(`api/get_stops/?agency=${agency}`);
+    const data = await response.json();
+    setStops(data);
+  };
+
+  const fetchIcon = async (agency: Agency) => {
+    const response = await fetch(`/api/get_icon/?agency=${agency}`);
+    const data = await response.json();
+    setIcon(data);
+  };
+
   // 運行情報の状態管理
   const [tripUpdate, setTripUpdate] = useState<TripUpdate[] | null>(null);
   const [vposUpdate, setVposUpdate] = useState<VposUpdate[] | null>(null);
+  const [routes, setRoutes] = useState<Routes[] | null>(null);
+  const [routesJp, setRoutesJp] = useState<RoutesJp[] | null>(null);
+  const [stops, setStops] = useState<Stops[] | null>(null);
+  const [icon, setIcon] = useState<Icon[] | null>(null);
 
   useEffect(() => {
     fetchTripUpdate(props.agency);
     fetchVposUpdate(props.agency);
+    fetchRoutes(props.agency);
+    fetchRoutesJp(props.agency);
+    fetchStops(props.agency);
+    fetchIcon(props.agency);
   }, [props.agency]);
 
   return (
@@ -40,7 +75,7 @@ const MarkerGroup = (props: MarkerGroupProps) => {
               <Marker
                 key={vpos.vehicle.vehicle.id}
                 trip={
-                  tripUpdate
+                  tripUpdate && vpos
                     ? tripUpdate.filter(
                         (trip) =>
                           trip.tripUpdate.vehicle.id === vpos.vehicle.vehicle.id
@@ -48,6 +83,13 @@ const MarkerGroup = (props: MarkerGroupProps) => {
                     : null
                 }
                 vpos={vpos}
+                icon={
+                  icon && vpos
+                    ? icon?.filter(
+                        (i) => i.label === vpos.vehicle.vehicle.label
+                      )[0]
+                    : null
+                }
                 zIndex={Number(props.agency) * 100 + index}
               />
             </React.Fragment>
@@ -60,6 +102,7 @@ const MarkerGroup = (props: MarkerGroupProps) => {
 type MarkerProps = {
   trip: TripUpdate | null;
   vpos: VposUpdate | null;
+  icon: Icon | null;
   zIndex: number;
 };
 
@@ -83,10 +126,10 @@ const Marker = (props: MarkerProps) => {
   };
 
   const getIcon = (): string => {
-    if (props.vpos) {
-      return "201_r.png";
+    if (props.icon) {
+      return props.icon.url;
     }
-    return "";
+    return "/unknown.png";
   };
 
   const getDestinationStopName = (): string => {
@@ -127,10 +170,14 @@ const Marker = (props: MarkerProps) => {
         position={getPosition()}
         zIndex={props.zIndex}
         title={getTitle()}
-        icon={{
-          url: getIcon(),
-          scaledSize: new window.google.maps.Size(60, 60),
-        }}
+        icon={
+          getIcon()
+            ? {
+                url: getIcon(),
+                scaledSize: new window.google.maps.Size(60, 60),
+              }
+            : undefined
+        }
         // onClick={() => setActiveMarkerId(marker.id)} // マーカークリックでInfoWindowFを開く
       />
       {/* {activeMarkerId === marker.id && (

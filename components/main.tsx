@@ -60,11 +60,7 @@ const Main = () => {
             </div>
           </OverlayView>
         )}
-        <MarkerGroup agency={Agency.RYOBI} />
-        {/* {markers.map((marker) => (
-            <React.Fragment key={marker.id}>
-            </React.Fragment>
-          ))} */}
+        <MarkerGroup agency={Agency.RYOBI} activeMarkerId={activeMarkerId} />
       </GoogleMap>
     </LoadScript>
   );
