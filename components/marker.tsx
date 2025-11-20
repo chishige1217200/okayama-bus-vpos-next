@@ -85,7 +85,7 @@ const MarkerGroup = (props: MarkerGroupProps) => {
     <>
       {vposUpdateList
         ? vposUpdateList.map((vpos, index) => (
-            <React.Fragment key={vpos.vehicle.vehicle.id}>
+            <React.Fragment key={`${props.agency}_${vpos.vehicle.vehicle.id}`}>
               <Marker
                 agency={props.agency}
                 key={vpos.vehicle.vehicle.id}
@@ -143,21 +143,34 @@ const Marker = (props: MarkerProps) => {
       const routes = props.routes.find(
         (r) => r.route_id === props.vpos?.vehicle.trip.routeId
       );
-      return routes?.route_short_name ?? "";
+      return props.agency !== Agency.HAKKOU
+        ? routes?.route_short_name ?? ""
+        : routes?.route_long_name ?? "";
     }
     return "";
   };
 
   const getDestinationStopName = (): string => {
-    if (props.routesJp && props.vpos) {
-      const routesJp = props.routesJp.find(
-        (r) => r.route_id === props.vpos?.vehicle.trip.routeId
-      );
+    if (props.agency === Agency.HAKKOU) {
+      if (props.routes && props.vpos) {
+        const routes = props.routes.find(
+          (r) => r.route_id === props.vpos?.vehicle.trip.routeId
+        );
 
-      const destinationStopName = routesJp?.destination_stop ?? "";
-      return getRouteShortName().includes("特急")
-        ? `特急 ${destinationStopName}`
-        : destinationStopName;
+        const destinationStopName = routes?.route_long_name ?? "";
+        return destinationStopName;
+      }
+    } else {
+      if (props.routesJp && props.vpos) {
+        const routesJp = props.routesJp.find(
+          (r) => r.route_id === props.vpos?.vehicle.trip.routeId
+        );
+
+        const destinationStopName = routesJp?.destination_stop ?? "";
+        return getRouteShortName().includes("特急")
+          ? `特急 ${destinationStopName}`
+          : destinationStopName;
+      }
     }
     return "";
   };
@@ -306,10 +319,15 @@ const Marker = (props: MarkerProps) => {
             : undefined
         }
         onClick={() =>
-          props.setActiveMarkerId(props.vpos?.vehicle.vehicle.id ?? null)
+          props.setActiveMarkerId(
+            props.vpos?.vehicle.vehicle.id
+              ? `${props.agency}_${props.vpos.vehicle.vehicle.id}`
+              : null
+          )
         } // マーカークリックでInfoWindowFを開く
       />
-      {props.activeMarkerId === props.vpos?.vehicle.vehicle.id && (
+      {props.activeMarkerId ===
+        `${props.agency}_${props.vpos?.vehicle.vehicle.id}` && (
         <InfoWindowF
           position={getPosition()} // マーカー座標を指定
           options={{
