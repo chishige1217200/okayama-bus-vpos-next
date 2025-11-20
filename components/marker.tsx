@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 type MarkerGroupProps = {
   agency: Agency;
   activeMarkerId: string | null;
+  setActiveMarkerId: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 // 事業者毎に運行情報の取得を行う
@@ -103,6 +104,7 @@ const MarkerGroup = (props: MarkerGroupProps) => {
                 icon={iconList}
                 zIndex={Number(props.agency) * 100 + index}
                 activeMarkerId={props.activeMarkerId}
+                setActiveMarkerId={props.setActiveMarkerId}
               />
             </React.Fragment>
           ))
@@ -121,6 +123,7 @@ type MarkerProps = {
   icon: Icon[] | null;
   zIndex: number;
   activeMarkerId: string | null;
+  setActiveMarkerId: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 // 共通のマーカーコンポーネント
@@ -161,6 +164,7 @@ const Marker = (props: MarkerProps) => {
 
   const getNextStopName = (): string => {
     if (props.stops && props.trip && props.vpos) {
+      // 現在のstopSequenceのインデックスを取得
       const stopSequence =
         props.trip.tripUpdate.stopTimeUpdate.find(
           (s) => s.stopSequence === props.vpos?.vehicle.currentStopSequence
@@ -170,6 +174,7 @@ const Marker = (props: MarkerProps) => {
         stopSequence != null &&
         stopSequence < props.trip.tripUpdate.stopTimeUpdate.length
       ) {
+        // TODO: stopSequenceの値が配列の長さをはみ出さない考慮が必要
         const nextStopId =
           props.trip?.tripUpdate.stopTimeUpdate[stopSequence].stopId;
         if (nextStopId) {
@@ -291,15 +296,17 @@ const Marker = (props: MarkerProps) => {
               }
             : undefined
         }
-        // onClick={() => setActiveMarkerId(marker.id)} // マーカークリックでInfoWindowFを開く
+        onClick={() =>
+          props.setActiveMarkerId(props.vpos?.vehicle.vehicle.id ?? null)
+        } // マーカークリックでInfoWindowFを開く
       />
-      {props.activeMarkerId !== props.vpos?.vehicle.vehicle.id && (
+      {props.activeMarkerId === props.vpos?.vehicle.vehicle.id && (
         <InfoWindowF
           position={getPosition()} // マーカー座標を指定
           options={{
             pixelOffset: new window.google.maps.Size(0, -100), // マーカーとの相対位置を指定
           }}
-          // onCloseClick={() => setActiveMarkerId(null)} // 閉じるときにリセット
+          onCloseClick={() => props.setActiveMarkerId(null)} // 閉じるときにリセット
         >
           <div className="text-black">
             <div className="font-medium text-center">{getRouteShortName()}</div>

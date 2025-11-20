@@ -60,7 +60,11 @@ const Main = () => {
             </div>
           </OverlayView>
         )}
-        <MarkerGroup agency={Agency.RYOBI} activeMarkerId={activeMarkerId} />
+        <MarkerGroup
+          agency={Agency.RYOBI}
+          activeMarkerId={activeMarkerId}
+          setActiveMarkerId={setActiveMarkerId}
+        />
       </GoogleMap>
     </LoadScript>
   );
