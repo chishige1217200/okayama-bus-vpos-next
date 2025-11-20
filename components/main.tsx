@@ -61,7 +61,17 @@ const Main = () => {
           </OverlayView>
         )}
         <MarkerGroup
+          agency={Agency.OKADEN}
+          activeMarkerId={activeMarkerId}
+          setActiveMarkerId={setActiveMarkerId}
+        />
+        <MarkerGroup
           agency={Agency.RYOBI}
+          activeMarkerId={activeMarkerId}
+          setActiveMarkerId={setActiveMarkerId}
+        />
+        <MarkerGroup
+          agency={Agency.HAKKOU}
           activeMarkerId={activeMarkerId}
           setActiveMarkerId={setActiveMarkerId}
         />

@@ -143,9 +143,9 @@ const Marker = (props: MarkerProps) => {
       const routes = props.routes.find(
         (r) => r.route_id === props.vpos?.vehicle.trip.routeId
       );
-      return props.agency !== Agency.HAKKOU
-        ? routes?.route_short_name ?? ""
-        : routes?.route_long_name ?? "";
+      return props.agency !== Agency.RYOBI
+        ? routes?.route_long_name ?? ""
+        : routes?.route_short_name ?? "";
     }
     return "";
   };
