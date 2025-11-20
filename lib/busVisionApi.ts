@@ -16,7 +16,7 @@ export const fetchData = async (source: string) => {
     const FeedMessage = root.lookupType("transit_realtime.FeedMessage");
 
     // データの取得
-    const res = await fetch(source);
+    const res = await fetch(source, { cache: "no-store" });
     if (!res.ok) {
       console.error(`Error fetching data: ${res.status} ${res.statusText}`);
       throw new Error(`Error fetching data: ${res.status} ${res.statusText}`);
