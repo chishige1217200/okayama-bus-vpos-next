@@ -165,24 +165,33 @@ const Marker = (props: MarkerProps) => {
   const getNextStopName = (): string => {
     if (props.stops && props.trip && props.vpos) {
       // 現在のstopSequenceのインデックスを取得
-      const stopSequence =
-        props.trip.tripUpdate.stopTimeUpdate.find(
-          (s) => s.stopSequence === props.vpos?.vehicle.currentStopSequence
-        )?.stopSequence ?? null;
+      // stopSequenceと配列の添字が必ずしも一致しないことに注意する
+      const currentIndex = props.trip.tripUpdate.stopTimeUpdate.findIndex(
+        (stop) => stop.stopSequence === props.vpos?.vehicle.currentStopSequence
+      );
 
+      // 次のインデックスが存在する場合は、stopNameを返す
       if (
-        stopSequence != null &&
-        stopSequence < props.trip.tripUpdate.stopTimeUpdate.length
+        currentIndex !== -1 &&
+        currentIndex + 1 < props.trip.tripUpdate.stopTimeUpdate.length
       ) {
-        // TODO: stopSequenceの値が配列の長さをはみ出さない考慮が必要
-        const nextStopId =
-          props.trip?.tripUpdate.stopTimeUpdate[stopSequence].stopId;
-        if (nextStopId) {
-          return (
-            props.stops.find((s) => s.stop_id === nextStopId)?.stop_name ?? ""
-          );
-        }
+        return (
+          props.stops.find(
+            (s) =>
+              s.stop_id ===
+              props.trip?.tripUpdate.stopTimeUpdate[currentIndex + 1].stopId
+          )?.stop_name ?? ""
+        );
       }
+
+      // 次のインデックスが存在しない場合は、現在のstopNameを返す
+      return (
+        props.stops.find(
+          (s) =>
+            s.stop_id ===
+            props.trip?.tripUpdate.stopTimeUpdate[currentIndex].stopId
+        )?.stop_name ?? ""
+      );
     }
     return "";
   };
