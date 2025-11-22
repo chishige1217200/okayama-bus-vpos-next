@@ -7,7 +7,13 @@ import Image from "next/image";
 import MarkerGroup from "./marker";
 import { Agency } from "@/types/agency";
 
-const Main = () => {
+type MainProps = {
+  okaden: boolean;
+  ryobi: boolean;
+  hakkou: boolean;
+};
+
+const Main = (props: MainProps) => {
   // const [markers, setMarkers] = useState([]);
   const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null); // 開いているInfoWindowFを追跡
   // const [isLoading, setIsLoading] = useState(true); // ローディング状態
@@ -60,21 +66,33 @@ const Main = () => {
             </div>
           </OverlayView>
         )}
-        <MarkerGroup
-          agency={Agency.OKADEN}
-          activeMarkerId={activeMarkerId}
-          setActiveMarkerId={setActiveMarkerId}
-        />
-        <MarkerGroup
-          agency={Agency.RYOBI}
-          activeMarkerId={activeMarkerId}
-          setActiveMarkerId={setActiveMarkerId}
-        />
-        <MarkerGroup
-          agency={Agency.HAKKOU}
-          activeMarkerId={activeMarkerId}
-          setActiveMarkerId={setActiveMarkerId}
-        />
+        {props.okaden ? (
+          <MarkerGroup
+            agency={Agency.OKADEN}
+            activeMarkerId={activeMarkerId}
+            setActiveMarkerId={setActiveMarkerId}
+          />
+        ) : (
+          <></>
+        )}
+        {props.ryobi ? (
+          <MarkerGroup
+            agency={Agency.RYOBI}
+            activeMarkerId={activeMarkerId}
+            setActiveMarkerId={setActiveMarkerId}
+          />
+        ) : (
+          <></>
+        )}
+        {props.hakkou ? (
+          <MarkerGroup
+            agency={Agency.HAKKOU}
+            activeMarkerId={activeMarkerId}
+            setActiveMarkerId={setActiveMarkerId}
+          />
+        ) : (
+          <></>
+        )}
       </GoogleMap>
     </LoadScript>
   );
