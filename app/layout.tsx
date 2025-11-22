@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,7 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "岡山バス位置情報NEXT",
-  description: "Bus-Visionオープンデータを利用したバス位置情報表示アプリケーション",
+  description:
+    "Bus-Visionオープンデータを利用したバス位置情報表示アプリケーション",
 };
 
 export default function RootLayout({
@@ -27,7 +29,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <Suspense>{children}</Suspense>
       </body>
     </html>
   );
