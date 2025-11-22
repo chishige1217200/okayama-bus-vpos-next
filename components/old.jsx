@@ -126,7 +126,7 @@ const Old = () => {
   }, []);
 
   return (
-    <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_API_KEY}>
+    <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY}>
       <div style={{ position: "relative" }}>
         {/* ローディング画面 */}
         {isLoading && (
