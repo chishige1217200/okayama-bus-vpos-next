@@ -1,0 +1,21 @@
+{
+  "name": "岡山バス位置情報",
+  "short_name": "バス位置情報",
+  "description": "岡山バス位置情報NEXT",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
