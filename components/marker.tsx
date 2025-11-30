@@ -28,19 +28,19 @@ const MarkerGroup = (props: MarkerGroupProps) => {
   };
 
   const fetchRoutes = async (agency: Agency) => {
-    const response = await fetch(`api/get_routes/?agency=${agency}`);
+    const response = await fetch(`/api/get_routes/?agency=${agency}`);
     const data = await response.json();
     setRoutesList(data);
   };
 
   const fetchRoutesJp = async (agency: Agency) => {
-    const response = await fetch(`api/get_routes_jp/?agency=${agency}`);
+    const response = await fetch(`/api/get_routes_jp/?agency=${agency}`);
     const data = await response.json();
     setRoutesJpList(data);
   };
 
   const fetchStops = async (agency: Agency) => {
-    const response = await fetch(`api/get_stops/?agency=${agency}`);
+    const response = await fetch(`/api/get_stops/?agency=${agency}`);
     const data = await response.json();
     setStopsList(data);
   };
