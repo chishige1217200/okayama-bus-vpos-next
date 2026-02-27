@@ -6,6 +6,7 @@ import { GoogleMap, LoadScript, OverlayView } from "@react-google-maps/api";
 import Image from "next/image";
 import MarkerGroup from "./marker";
 import { Agency } from "@/types/agency";
+import { useFetchController } from "@/context/FetchContext";
 
 type MainProps = {
   okaden: boolean;
@@ -14,9 +15,8 @@ type MainProps = {
 };
 
 const Main = (props: MainProps) => {
-  // const [markers, setMarkers] = useState([]);
   const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null); // 開いているInfoWindowFを追跡
-  // const [isLoading, setIsLoading] = useState(true); // ローディング状態
+  const { fire, isLoading } = useFetchController(); // ローディング状態をFetchContextから取得
   const [center, setCenter] = useState<google.maps.LatLngLiteral>({
     lat: 34.663,
     lng: 133.925,
@@ -35,7 +35,7 @@ const Main = (props: MainProps) => {
         },
         (error) => {
           console.error("Error getting location:", error);
-        }
+        },
       );
     } else {
       console.warn("Geolocation is not supported by this browser.");
@@ -44,56 +44,120 @@ const Main = (props: MainProps) => {
 
   return (
     <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY ?? ""}>
-      <GoogleMap
-        mapContainerStyle={{ height: "100vh", width: "100vw" }}
-        center={center}
-        zoom={17}
-      >
-        {userLocation && (
-          <OverlayView
-            position={userLocation}
-            mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+      <div className="relative">
+        {/* ローディング画面 */}
+        {isLoading && (
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              display: "flex",
+              flexDirection: "column", // 縦方向に配置
+              justifyContent: "center", // 垂直方向の中央揃え
+              alignItems: "center", // 水平方向の中央揃え
+              zIndex: 10,
+              color: "white",
+            }}
           >
-            <div className="pulse-container">
-              <Image
-                src="/bluedot.png"
-                width={1}
-                height={1}
-                alt="現在地"
-                className="pulse-dot"
-              />
-              <div className="pulse-ring"></div>
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontSize: "40px", marginBottom: "10px" }}>
+                Now Loading...
+              </div>
+              <p style={{ fontSize: "18px", margin: 0 }}>
+                <b>ご利用上の注意</b>
+                <br />
+                本データをご利用された結果、あるいは使用できない等により直接的または間接的に生じたあらゆる損害、損失については、当システム管理者および各バス事業者は一切の責任を負いません。
+                <br />
+                本データは、バスの運行情報等を提供することで、利用者の利便性を図るものですが、その情報等についての安全性、確実性、有用性などの保証は負いかねますので、あらかじめご了承ください。
+                <br />
+                本データの正確性について、万全を期しておりますが利用者がデータを用いて行う一切の行為について、当システム管理者および各バス事業者は一切の責任を負いません。
+                <br />
+                ※情報の表示に数秒かかる場合があります。しばらくお待ちください。
+                <br />
+                <br />
+                データ提供元：
+                <a href="https://loc.bus-vision.jp/ryobi/view/opendata.html">
+                  Bus-Vision
+                </a>
+                　バス事業者：
+                <a href="https://www.ryobi-holdings.jp/bus/">両備バス</a>
+              </p>
             </div>
-          </OverlayView>
+          </div>
         )}
-        {props.okaden ? (
-          <MarkerGroup
-            agency={Agency.OKADEN}
-            activeMarkerId={activeMarkerId}
-            setActiveMarkerId={setActiveMarkerId}
-          />
-        ) : (
-          <></>
-        )}
-        {props.ryobi ? (
-          <MarkerGroup
-            agency={Agency.RYOBI}
-            activeMarkerId={activeMarkerId}
-            setActiveMarkerId={setActiveMarkerId}
-          />
-        ) : (
-          <></>
-        )}
-        {props.hakkou ? (
-          <MarkerGroup
-            agency={Agency.HAKKOU}
-            activeMarkerId={activeMarkerId}
-            setActiveMarkerId={setActiveMarkerId}
-          />
-        ) : (
-          <></>
-        )}
-      </GoogleMap>
+        <div
+          style={{
+            position: "absolute",
+            top: 10,
+            right: 60,
+            display: "flex",
+            zIndex: 5,
+            color: "white",
+          }}
+        >
+          <button
+            className="google-style-btn text-black"
+            onClick={() => fire()}
+            disabled={isLoading} // ローディング中はボタンを無効化
+          >
+            更新
+          </button>
+        </div>
+        <GoogleMap
+          mapContainerStyle={{ height: "100vh", width: "100vw" }}
+          center={center}
+          zoom={17}
+        >
+          {userLocation && (
+            <OverlayView
+              position={userLocation}
+              mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+            >
+              <div className="pulse-container">
+                <Image
+                  src="/bluedot.png"
+                  width={1}
+                  height={1}
+                  alt="現在地"
+                  className="pulse-dot"
+                />
+                <div className="pulse-ring"></div>
+              </div>
+            </OverlayView>
+          )}
+          {props.okaden ? (
+            <MarkerGroup
+              agency={Agency.OKADEN}
+              activeMarkerId={activeMarkerId}
+              setActiveMarkerId={setActiveMarkerId}
+            />
+          ) : (
+            <></>
+          )}
+          {props.ryobi ? (
+            <MarkerGroup
+              agency={Agency.RYOBI}
+              activeMarkerId={activeMarkerId}
+              setActiveMarkerId={setActiveMarkerId}
+            />
+          ) : (
+            <></>
+          )}
+          {props.hakkou ? (
+            <MarkerGroup
+              agency={Agency.HAKKOU}
+              activeMarkerId={activeMarkerId}
+              setActiveMarkerId={setActiveMarkerId}
+            />
+          ) : (
+            <></>
+          )}
+        </GoogleMap>
+      </div>
     </LoadScript>
   );
 };
