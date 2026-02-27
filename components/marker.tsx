@@ -1,10 +1,11 @@
+import { useFetchController } from "@/context/FetchContext";
 import { Agency, getVehicleStateUrl } from "@/types/agency";
 import { Routes, RoutesJp, Stops } from "@/types/gtfsFeed";
 import { Icon } from "@/types/icon";
 import { TripUpdate } from "@/types/tripUpdate";
 import { VposUpdate } from "@/types/vposUpdate";
 import { InfoWindowF, MarkerF, OverlayView } from "@react-google-maps/api";
-import React from "react";
+import React, { useCallback } from "react";
 import { useEffect, useState } from "react";
 
 type MarkerGroupProps = {
@@ -51,35 +52,71 @@ const MarkerGroup = (props: MarkerGroupProps) => {
     setIconList(data);
   };
 
+  const fetchStaticData = useCallback(async (agency: Agency) => {
+    await Promise.all([
+      fetchRoutes(agency),
+      fetchRoutesJp(agency),
+      fetchStops(agency),
+      fetchIcon(agency),
+    ]);
+  }, []);
+
+  const fetchRealtimeData = useCallback(async (agency: Agency) => {
+    await Promise.all([
+      fetchTripUpdate(agency),
+      fetchVposUpdate(agency),
+    ]);
+  }, []);
+
+  // FetchContextから必要な関数と状態を取得
+  const { trigger, start, finish } = useFetchController();
+
   // 運行情報の状態管理
   const [tripUpdateList, setTripUpdateList] = useState<TripUpdate[] | null>(
-    null
+    null,
   );
   const [vposUpdateList, setVposUpdateList] = useState<VposUpdate[] | null>(
-    null
+    null,
   );
   const [routesList, setRoutesList] = useState<Routes[] | null>(null);
   const [routesJpList, setRoutesJpList] = useState<RoutesJp[] | null>(null);
   const [stopsList, setStopsList] = useState<Stops[] | null>(null);
   const [iconList, setIconList] = useState<Icon[] | null>(null);
 
+  // 初回フェッチ（事業者変更時もフェッチするが、基本発生しない）
   useEffect(() => {
-    fetchTripUpdate(props.agency);
-    fetchVposUpdate(props.agency);
-    fetchRoutes(props.agency);
-    fetchRoutesJp(props.agency);
-    fetchStops(props.agency);
-    fetchIcon(props.agency);
-  }, [props.agency]);
+    if (!props.agency) return;
 
+    fetchStaticData(props.agency);
+    fetchRealtimeData(props.agency);
+  }, [props.agency, fetchStaticData, fetchRealtimeData]);
+
+  // 20秒ごとに運行情報を更新する
   useEffect(() => {
+    if (!props.agency) return;
+
     const interval = setInterval(() => {
-      fetchTripUpdate(props.agency);
-      fetchVposUpdate(props.agency);
+      fetchRealtimeData(props.agency);
     }, 20000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [props.agency, fetchRealtimeData]);
+
+  // triggerが更新されたときに運行情報を再取得する
+  useEffect(() => {
+    if (trigger === 0 || !props.agency) return;
+
+    const run = async () => {
+      start();
+      try {
+        await fetchRealtimeData(props.agency);
+      } finally {
+        finish();
+      }
+    };
+
+    run();
+  }, [trigger, props.agency, start, finish, fetchRealtimeData]);
 
   return (
     <>
@@ -91,10 +128,11 @@ const MarkerGroup = (props: MarkerGroupProps) => {
                 key={vpos.vehicle.vehicle.id}
                 trip={
                   tripUpdateList && vpos
-                    ? tripUpdateList.find(
+                    ? (tripUpdateList.find(
                         (trip) =>
-                          trip.tripUpdate.vehicle.id === vpos.vehicle.vehicle.id
-                      ) ?? null
+                          trip.tripUpdate.vehicle.id ===
+                          vpos.vehicle.vehicle.id,
+                      ) ?? null)
                     : null
                 }
                 vpos={vpos}
@@ -141,11 +179,11 @@ const Marker = (props: MarkerProps) => {
   const getRouteShortName = (): string => {
     if (props.routes && props.vpos) {
       const routes = props.routes.find(
-        (r) => r.route_id === props.vpos?.vehicle.trip.routeId
+        (r) => r.route_id === props.vpos?.vehicle.trip.routeId,
       );
       return props.agency !== Agency.RYOBI
-        ? routes?.route_long_name ?? ""
-        : routes?.route_short_name ?? "";
+        ? (routes?.route_long_name ?? "")
+        : (routes?.route_short_name ?? "");
     }
     return "";
   };
@@ -154,7 +192,7 @@ const Marker = (props: MarkerProps) => {
     if (props.agency === Agency.HAKKOU) {
       if (props.routes && props.vpos) {
         const routes = props.routes.find(
-          (r) => r.route_id === props.vpos?.vehicle.trip.routeId
+          (r) => r.route_id === props.vpos?.vehicle.trip.routeId,
         );
 
         const destinationStopName = routes?.route_long_name ?? "";
@@ -163,7 +201,7 @@ const Marker = (props: MarkerProps) => {
     } else {
       if (props.routesJp && props.vpos) {
         const routesJp = props.routesJp.find(
-          (r) => r.route_id === props.vpos?.vehicle.trip.routeId
+          (r) => r.route_id === props.vpos?.vehicle.trip.routeId,
         );
 
         const destinationStopName = routesJp?.destination_stop ?? "";
@@ -180,7 +218,7 @@ const Marker = (props: MarkerProps) => {
       // 現在のstopSequenceのインデックスを取得
       // stopSequenceと配列の添字が必ずしも一致しないことに注意する
       const currentIndex = props.trip.tripUpdate.stopTimeUpdate.findIndex(
-        (stop) => stop.stopSequence === props.vpos?.vehicle.currentStopSequence
+        (stop) => stop.stopSequence === props.vpos?.vehicle.currentStopSequence,
       );
 
       // 次のインデックスが存在する場合は、stopNameを返す
@@ -192,7 +230,7 @@ const Marker = (props: MarkerProps) => {
           props.stops.find(
             (s) =>
               s.stop_id ===
-              props.trip?.tripUpdate.stopTimeUpdate[currentIndex + 1].stopId
+              props.trip?.tripUpdate.stopTimeUpdate[currentIndex + 1].stopId,
           )?.stop_name ?? ""
         );
       }
@@ -202,7 +240,7 @@ const Marker = (props: MarkerProps) => {
         props.stops.find(
           (s) =>
             s.stop_id ===
-            props.trip?.tripUpdate.stopTimeUpdate[currentIndex].stopId
+            props.trip?.tripUpdate.stopTimeUpdate[currentIndex].stopId,
         )?.stop_name ?? ""
       );
     }
@@ -221,7 +259,7 @@ const Marker = (props: MarkerProps) => {
     if (props.trip && props.vpos) {
       // 現在のstopSequenceのインデックスを取得
       const currentIndex = props.trip.tripUpdate.stopTimeUpdate.findIndex(
-        (stop) => stop.stopSequence === props.vpos?.vehicle.currentStopSequence
+        (stop) => stop.stopSequence === props.vpos?.vehicle.currentStopSequence,
       );
 
       // 現在のインデックスが存在する場合は、現在の遅れ時分を返す
@@ -232,13 +270,13 @@ const Marker = (props: MarkerProps) => {
         delay =
           Math.floor(
             props.trip.tripUpdate.stopTimeUpdate[currentIndex].arrival.delay /
-              60
+              60,
           ) ?? null; // 正常に遅れ時分が取得できない場合はnull
       } else {
         // インデックスが取得できない場合は、始発時点の遅れ時分を返す
         delay =
           Math.floor(
-            props.trip.tripUpdate.stopTimeUpdate[0].arrival.delay / 60
+            props.trip.tripUpdate.stopTimeUpdate[0].arrival.delay / 60,
           ) ?? null; // 正常に遅れ時分が取得できない場合はnull
       }
     }
@@ -275,7 +313,7 @@ const Marker = (props: MarkerProps) => {
   const getIcon = (): string => {
     if (props.icon && props.vpos) {
       const icon = props.icon.find(
-        (icon) => icon.label === props.vpos?.vehicle.vehicle.label
+        (icon) => icon.label === props.vpos?.vehicle.vehicle.label,
       );
       return icon?.url ?? "/unknown.png";
     }
@@ -322,7 +360,7 @@ const Marker = (props: MarkerProps) => {
           props.setActiveMarkerId(
             props.vpos?.vehicle.vehicle.id
               ? `${props.agency}_${props.vpos.vehicle.vehicle.id}`
-              : null
+              : null,
           )
         } // マーカークリックでInfoWindowFを開く
       />
@@ -348,7 +386,7 @@ const Marker = (props: MarkerProps) => {
                     className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
                     href={getVehicleStateUrl(
                       props.agency,
-                      props.vpos.vehicle.vehicle.id
+                      props.vpos.vehicle.vehicle.id,
                     )}
                     target="_blank"
                     rel="noopener noreferrer"
