@@ -62,10 +62,7 @@ const MarkerGroup = (props: MarkerGroupProps) => {
   }, []);
 
   const fetchRealtimeData = useCallback(async (agency: Agency) => {
-    await Promise.all([
-      fetchTripUpdate(agency),
-      fetchVposUpdate(agency),
-    ]);
+    await Promise.all([fetchTripUpdate(agency), fetchVposUpdate(agency)]);
   }, []);
 
   // FetchContextから必要な関数と状態を取得
@@ -95,12 +92,17 @@ const MarkerGroup = (props: MarkerGroupProps) => {
   useEffect(() => {
     if (!props.agency) return;
 
-    const interval = setInterval(() => {
-      fetchRealtimeData(props.agency);
+    const interval = setInterval(async () => {
+      start();
+      try {
+        await fetchRealtimeData(props.agency);
+      } finally {
+        finish();
+      }
     }, 20000);
 
     return () => clearInterval(interval);
-  }, [props.agency, fetchRealtimeData]);
+  }, [props.agency, start, finish, fetchRealtimeData]);
 
   // triggerが更新されたときに運行情報を再取得する
   useEffect(() => {

@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
+import { AgencyProvider } from "@/context/AgencyContext";
 import { FetchProvider } from "@/context/FetchContext";
+import { SearchProvider } from "@/context/SearchContext";
+import { TrackingProvider } from "@/context/TrackingContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +34,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Suspense>
-          <FetchProvider>{children}</FetchProvider>
+          <AgencyProvider>
+            <FetchProvider>
+              <TrackingProvider>
+                <SearchProvider>{children}</SearchProvider>
+              </TrackingProvider>
+            </FetchProvider>
+          </AgencyProvider>
         </Suspense>
       </body>
     </html>

@@ -5,18 +5,13 @@ import "./main.css";
 import { GoogleMap, LoadScript, OverlayView } from "@react-google-maps/api";
 import Image from "next/image";
 import MarkerGroup from "./marker";
-import { Agency } from "@/types/agency";
 import { useFetchController } from "@/context/FetchContext";
+import { useAgency } from "@/context/AgencyContext";
 
-type MainProps = {
-  okaden: boolean;
-  ryobi: boolean;
-  hakkou: boolean;
-};
-
-const Main = (props: MainProps) => {
+const Main = () => {
   const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null); // 開いているInfoWindowFを追跡
   const { fire, isLoading } = useFetchController(); // ローディング状態をFetchContextから取得
+  const { searchAgencies } = useAgency(); // 検索対象のバス事業者をFetchContextから取得
   const [center, setCenter] = useState<google.maps.LatLngLiteral>({
     lat: 34.663,
     lng: 133.925,
@@ -129,33 +124,14 @@ const Main = (props: MainProps) => {
               </div>
             </OverlayView>
           )}
-          {props.okaden ? (
+          {searchAgencies.map((agency) => (
             <MarkerGroup
-              agency={Agency.OKADEN}
+              key={agency}
+              agency={agency}
               activeMarkerId={activeMarkerId}
               setActiveMarkerId={setActiveMarkerId}
             />
-          ) : (
-            <></>
-          )}
-          {props.ryobi ? (
-            <MarkerGroup
-              agency={Agency.RYOBI}
-              activeMarkerId={activeMarkerId}
-              setActiveMarkerId={setActiveMarkerId}
-            />
-          ) : (
-            <></>
-          )}
-          {props.hakkou ? (
-            <MarkerGroup
-              agency={Agency.HAKKOU}
-              activeMarkerId={activeMarkerId}
-              setActiveMarkerId={setActiveMarkerId}
-            />
-          ) : (
-            <></>
-          )}
+          ))}
         </GoogleMap>
       </div>
     </LoadScript>
