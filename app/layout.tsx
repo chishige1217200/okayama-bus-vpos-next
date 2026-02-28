@@ -6,6 +6,8 @@ import { AgencyProvider } from "@/context/AgencyContext";
 import { FetchProvider } from "@/context/FetchContext";
 import { SearchProvider } from "@/context/SearchContext";
 import { TrackingProvider } from "@/context/TrackingContext";
+import { Provider } from "@/components/ui/provider";
+import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,13 +36,18 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Suspense>
-          <AgencyProvider>
-            <FetchProvider>
-              <TrackingProvider>
-                <SearchProvider>{children}</SearchProvider>
-              </TrackingProvider>
-            </FetchProvider>
-          </AgencyProvider>
+          <Provider>
+            <AgencyProvider>
+              <FetchProvider>
+                <TrackingProvider>
+                  <SearchProvider>
+                    <Toaster />
+                    {children}
+                  </SearchProvider>
+                </TrackingProvider>
+              </FetchProvider>
+            </AgencyProvider>
+          </Provider>
         </Suspense>
       </body>
     </html>

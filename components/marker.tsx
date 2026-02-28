@@ -4,9 +4,11 @@ import { Routes, RoutesJp, Stops } from "@/types/gtfsFeed";
 import { Icon } from "@/types/icon";
 import { TripUpdate } from "@/types/tripUpdate";
 import { VposUpdate } from "@/types/vposUpdate";
+import { Link, Text, VStack } from "@chakra-ui/react";
 import { InfoWindowF, MarkerF, OverlayView } from "@react-google-maps/api";
 import React, { useCallback } from "react";
 import { useEffect, useState } from "react";
+import { LuExternalLink } from "react-icons/lu";
 
 type MarkerGroupProps = {
   agency: Agency;
@@ -375,31 +377,48 @@ const Marker = (props: MarkerProps) => {
           }}
           onCloseClick={() => props.setActiveMarkerId(null)} // 閉じるときにリセット
         >
-          <div className="text-black">
-            <div className="font-medium text-center">{getRouteShortName()}</div>
-            <div className="text-center">
-              <p>{getLabel()}号車</p>
-              <p className="font-medium">次は {getNextStopName()}</p>
-              <p>{getDelay()}</p>
-              <p>{getOccupancyStatus()}</p>
-              <p>
-                {props.vpos ? (
-                  <a
-                    className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
-                    href={getVehicleStateUrl(
-                      props.agency,
-                      props.vpos.vehicle.vehicle.id,
-                    )}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    詳しい運行状況
-                  </a>
-                ) : (
-                  <></>
-                )}
-              </p>
-            </div>
+          <div>
+            <VStack gap={1} padding="1">
+              <Text color="black.600" fontWeight="medium">
+                {getRouteShortName()}
+              </Text>
+              <Text color="black.600">{getLabel()}号車</Text>
+              <Text color="black.600" fontWeight="normal">
+                次は {getNextStopName()}
+              </Text>
+              <Text color="black.600">{getDelay()}</Text>
+              <Text color="black.600">{getOccupancyStatus()}</Text>
+              {props.vpos ? (
+                // <a
+                //   className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+                //   href={getVehicleStateUrl(
+                //     props.agency,
+                //     props.vpos.vehicle.vehicle.id,
+                //   )}
+                //   target="_blank"
+                //   rel="noopener noreferrer"
+                // >
+                //   詳しい運行状況
+                // </a>
+                <Link
+                  href={getVehicleStateUrl(
+                    props.agency,
+                    props.vpos.vehicle.vehicle.id,
+                  )}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  textDecoration="underline"
+                  color="blue.600"
+                  _hover={{ color: "blue.800" }}
+                  _visited={{ color: "purple.600" }}
+                >
+                  詳しい運行状況
+                  <LuExternalLink />
+                </Link>
+              ) : (
+                <></>
+              )}
+            </VStack>
           </div>
         </InfoWindowF>
       )}
