@@ -1,3 +1,4 @@
+"use client";
 import { AbsoluteCenter, HStack, Link, Text, VStack } from "@chakra-ui/react";
 
 export default function Home() {
