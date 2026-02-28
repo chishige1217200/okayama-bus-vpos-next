@@ -1,26 +1,25 @@
 "use client";
-import { AbsoluteCenter, HStack, Link, Text, VStack } from "@chakra-ui/react";
+import { Box, Center, HStack, Link, Text } from "@chakra-ui/react";
 
 export default function Home() {
   return (
-    <>
-      <AbsoluteCenter>
-        <VStack>
-          <Text>旧システムのサポートは終了しました。</Text>
-          <HStack>
-            <Text>新システムは</Text>
-            <Link
-              href={"/"}
-              textDecoration="underline"
-              color="blue.600"
-              _hover={{ color: "blue.800" }}
-              _visited={{ color: "purple.600" }}
-            >
-              こちら
-            </Link>
-          </HStack>
-        </VStack>
-      </AbsoluteCenter>
-    </>
+    <Center minH="100vh">
+      <Box textAlign="center" bg="bg.emphasized" padding={4} rounded={16}>
+        <Text>旧システムのサポートは終了しました。</Text>
+
+        <HStack justify="center" mt={2}>
+          <Text>新システムは</Text>
+          <Link
+            href={"/"}
+            textDecoration="underline"
+            color="blue.600"
+            _hover={{ color: "blue.800" }}
+            _visited={{ color: "purple.600" }}
+          >
+            こちら
+          </Link>
+        </HStack>
+      </Box>
+    </Center>
   );
 }
