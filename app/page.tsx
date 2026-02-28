@@ -25,9 +25,5 @@ export default function Home() {
     setSearchAgencies(agencyArray);
   }, [agencyArray, setSearchAgencies]);
 
-  return (
-    <>
-      <Main />;
-    </>
-  );
+  return <Main />;
 }
