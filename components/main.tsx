@@ -9,7 +9,6 @@ import { useFetchController } from "@/context/FetchContext";
 import { useAgency } from "@/context/AgencyContext";
 import { Button } from "@chakra-ui/react/button";
 import { Theme } from "@chakra-ui/react";
-import SearchBar from "./searchBar";
 
 const Main = () => {
   const { fire, isLoading } = useFetchController(); // ローディング状態をFetchContextから取得
@@ -108,7 +107,6 @@ const Main = () => {
           </div>
         </LoadScript>
       </Theme>
-      <SearchBar />
     </>
   );
 };
