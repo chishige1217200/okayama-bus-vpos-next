@@ -20,38 +20,62 @@ type MarkerGroupProps = {
 const MarkerGroup = (props: MarkerGroupProps) => {
   const fetchTripUpdate = async (agency: Agency) => {
     const response = await fetch(`/api/get_trip_update/?agency=${agency}`);
-    const data = await response.json();
-    setTripUpdateList(data);
+
+    if (response.ok) {
+      const data = await response.json();
+      setTripUpdateList(data);
+    }
+    // 通信エラー発生時は前の状態を維持する
   };
 
   const fetchVposUpdate = async (agency: Agency) => {
     const response = await fetch(`/api/get_vehicle_position/?agency=${agency}`);
-    const data = await response.json();
-    setVposUpdateList(data);
+
+    if (response.ok) {
+      const data = await response.json();
+      setVposUpdateList(data);
+    }
+    // 通信エラー発生時は前の状態を維持する
   };
 
   const fetchRoutes = async (agency: Agency) => {
     const response = await fetch(`/api/get_routes/?agency=${agency}`);
-    const data = await response.json();
-    setRoutesList(data);
+    if (response.ok) {
+      const data = await response.json();
+      setRoutesList(data);
+    } else {
+      setRoutesList([]);
+    }
   };
 
   const fetchRoutesJp = async (agency: Agency) => {
     const response = await fetch(`/api/get_routes_jp/?agency=${agency}`);
-    const data = await response.json();
-    setRoutesJpList(data);
+    if (response.ok) {
+      const data = await response.json();
+      setRoutesJpList(data);
+    } else {
+      setRoutesJpList([]);
+    }
   };
 
   const fetchStops = async (agency: Agency) => {
     const response = await fetch(`/api/get_stops/?agency=${agency}`);
-    const data = await response.json();
-    setStopsList(data);
+    if (response.ok) {
+      const data = await response.json();
+      setStopsList(data);
+    } else {
+      setStopsList([]);
+    }
   };
 
   const fetchIcon = async (agency: Agency) => {
     const response = await fetch(`/api/get_icon/?agency=${agency}`);
-    const data = await response.json();
-    setIconList(data);
+    if (response.ok) {
+      const data = await response.json();
+      setIconList(data);
+    } else {
+      setIconList([]);
+    }
   };
 
   const fetchStaticData = useCallback(async (agency: Agency) => {
@@ -379,27 +403,12 @@ const Marker = (props: MarkerProps) => {
         >
           <div>
             <VStack gap={1} padding="1">
-              <Text color="black.600" fontWeight="medium">
-                {getRouteShortName()}
-              </Text>
-              <Text color="black.600">{getLabel()}号車</Text>
-              <Text color="black.600" fontWeight="normal">
-                次は {getNextStopName()}
-              </Text>
-              <Text color="black.600">{getDelay()}</Text>
-              <Text color="black.600">{getOccupancyStatus()}</Text>
+              <Text fontWeight="medium">{getRouteShortName()}</Text>
+              <Text>{getLabel()}号車</Text>
+              <Text fontWeight="normal">次は {getNextStopName()}</Text>
+              <Text>{getDelay()}</Text>
+              <Text>{getOccupancyStatus()}</Text>
               {props.vpos ? (
-                // <a
-                //   className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
-                //   href={getVehicleStateUrl(
-                //     props.agency,
-                //     props.vpos.vehicle.vehicle.id,
-                //   )}
-                //   target="_blank"
-                //   rel="noopener noreferrer"
-                // >
-                //   詳しい運行状況
-                // </a>
                 <Link
                   href={getVehicleStateUrl(
                     props.agency,
