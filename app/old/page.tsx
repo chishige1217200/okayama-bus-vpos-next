@@ -10,7 +10,7 @@ export default function Home() {
         <HStack justify="center" mt={2}>
           <Text>新システムは</Text>
           <Link
-            href={"/"}
+            href={"/search"}
             textDecoration="underline"
             color="blue.600"
             _hover={{ color: "blue.800" }}
