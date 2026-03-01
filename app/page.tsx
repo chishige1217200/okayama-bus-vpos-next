@@ -26,7 +26,7 @@ export default function TermsPage() {
     router.push("/search");
   };
 
-  const termsText = `この利用規約は、このウェブサイト上で提供する岡山バス位置情報サービス（以下、「本サービス」といいます。）の利用条件を定めるものです。
+  const termsText = `この利用規約は、このウェブサイト上で提供する岡山バス位置情報サービス（以下、「本サービス」と言います。）の利用条件を定めるものです。
 利用者の皆さまには、利用規約に従って、本サービスをご利用いただきます。
 
 第1条（保証の否認および免責事項）
@@ -44,7 +44,14 @@ export default function TermsPage() {
 　6. 不正アクセスをし、またはこれを試みる行為
 　7. 不正な目的を持って本サービスを利用する行為
 　8. 本サービスの他の利用者またはその他の第三者に不利益、損害、不快感を与える行為
-　9. その他、本サービス管理者が不適切と判断する行為`;
+　9. その他、本サービス管理者が不適切と判断する行為
+
+第3条（個人情報の取扱い）
+　本サービスは、利用者の現在地付近のバス運行情報を提供するため位置情報を収集しますが、利用者は収集を拒否することもできます。
+　拒否した場合であっても、バス運行情報の閲覧は可能です。
+　収集した位置情報は利用者の端末上でのみ処理され、サーバーには送信されません。
+
+以上`;
 
   return (
     <Center minH="100dvh" px={{ base: 4, md: 6 }} py={{ base: 6, md: 10 }}>
@@ -73,7 +80,7 @@ export default function TermsPage() {
             <Text whiteSpace="pre-wrap" color="blackAlpha.900">
               {termsText}
               <br />
-              {"\n"}データ提供元：
+              {"\n"}本サービスの提供には、
               <Link
                 href="https://loc.bus-vision.jp/ryobi/view/opendata.html"
                 color="blue.600"
@@ -83,7 +90,8 @@ export default function TermsPage() {
               >
                 Bus-Vision
               </Link>
-              {"\n"}バス事業者：
+              オープンデータを使用しています。
+              {"\n"}対象のバス事業者：
               <Link
                 href="https://www.ryobi-holdings.jp/bus/"
                 color="blue.600"
