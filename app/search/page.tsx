@@ -3,13 +3,12 @@ import Main from "@/components/main";
 import { useAgency } from "@/context/AgencyContext";
 import { Agency } from "@/types/agency";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 
 const STORAGE_KEY = "termsAgreed";
 
 export default function Home() {
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
 
   const { setSearchAgencies } = useAgency();
   const searchParams = useSearchParams();
@@ -31,16 +30,11 @@ export default function Home() {
   }, [agencyArray, setSearchAgencies]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMounted(true);
-
     const agreed = localStorage.getItem(STORAGE_KEY);
     if (!agreed) {
       router.replace("/");
     }
   }, [router]);
 
-  if (!mounted) return null;
-
-  return <Main />;
+  return router ? <Main /> : <></>;
 }
