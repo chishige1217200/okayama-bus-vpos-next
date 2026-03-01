@@ -122,7 +122,6 @@ export default function TermsPage() {
             </Text>
           </Box>
 
-          {/* ===== チェックボックス ===== */}
           <Checkbox.Root
             checked={checked}
             onCheckedChange={(e) => setChecked(!!e.checked)}
@@ -132,7 +131,6 @@ export default function TermsPage() {
             <Checkbox.Label>利用規約に同意します</Checkbox.Label>
           </Checkbox.Root>
 
-          {/* ===== 同意ボタン ===== */}
           <Button
             colorScheme="blue"
             size="lg"
