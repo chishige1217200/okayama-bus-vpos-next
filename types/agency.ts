@@ -11,7 +11,7 @@ export const getTripUpdateUrl = (agency: Agency): string => {
     case Agency.OKADEN:
       return "https://loc.bus-vision.jp/realtime/okaden_trip_update.bin";
     case Agency.RYOBI:
-      return "http://localhost:3001/file1";
+      return "https://loc.bus-vision.jp/realtime/ryobi_trip_update.bin";
     case Agency.HAKKOU:
       return "https://loc.bus-vision.jp/realtime/hakkou_trip_update_v2.bin";
     default:
@@ -24,7 +24,7 @@ export const getVehiclePositionUrl = (agency: Agency): string => {
     case Agency.OKADEN:
       return "https://loc.bus-vision.jp/realtime/okaden_vpos_update.bin";
     case Agency.RYOBI:
-      return "http://localhost:3001/file2";
+      return "https://loc.bus-vision.jp/realtime/ryobi_vpos_update.bin";
     case Agency.HAKKOU:
       return "https://loc.bus-vision.jp/realtime/hakkou_vpos_update_v2.bin";
     default:
