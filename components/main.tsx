@@ -12,7 +12,6 @@ import { Theme } from "@chakra-ui/react";
 import SearchBar from "./searchBar";
 
 const Main = () => {
-  const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null); // 開いているInfoWindowFを追跡
   const { fire, isLoading } = useFetchController(); // ローディング状態をFetchContextから取得
   const { searchAgencies } = useAgency(); // 検索対象のバス事業者をFetchContextから取得
   const [center, setCenter] = useState<google.maps.LatLngLiteral>({
@@ -103,12 +102,7 @@ const Main = () => {
                 </OverlayView>
               )}
               {searchAgencies.map((agency) => (
-                <MarkerGroup
-                  key={agency}
-                  agency={agency}
-                  activeMarkerId={activeMarkerId}
-                  setActiveMarkerId={setActiveMarkerId}
-                />
+                <MarkerGroup key={agency} agency={agency} />
               ))}
             </GoogleMap>
           </div>

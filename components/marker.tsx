@@ -1,4 +1,5 @@
 import { useFetchController } from "@/context/FetchContext";
+import { useTracking } from "@/context/TrackingContext";
 import { Agency, getVehicleStateUrl } from "@/types/agency";
 import { Routes, RoutesJp, Stops } from "@/types/gtfsFeed";
 import { Icon } from "@/types/icon";
@@ -12,8 +13,6 @@ import { LuExternalLink } from "react-icons/lu";
 
 type MarkerGroupProps = {
   agency: Agency;
-  activeMarkerId: string | null;
-  setActiveMarkerId: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 // 事業者毎に運行情報の取得を行う
@@ -169,8 +168,6 @@ const MarkerGroup = (props: MarkerGroupProps) => {
                 stops={stopsList}
                 icon={iconList}
                 zIndex={Number(props.agency) * 100 + index}
-                activeMarkerId={props.activeMarkerId}
-                setActiveMarkerId={props.setActiveMarkerId}
               />
             </React.Fragment>
           ))
@@ -188,12 +185,12 @@ type MarkerProps = {
   stops: Stops[] | null;
   icon: Icon[] | null;
   zIndex: number;
-  activeMarkerId: string | null;
-  setActiveMarkerId: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 // 共通のマーカーコンポーネント
 const Marker = (props: MarkerProps) => {
+  const { trackingVehicleId, setTrackingVehicleId } = useTracking();
+
   const getPosition = (): google.maps.LatLngLiteral => {
     if (props.vpos) {
       return {
@@ -385,21 +382,21 @@ const Marker = (props: MarkerProps) => {
             : undefined
         }
         onClick={() =>
-          props.setActiveMarkerId(
+          setTrackingVehicleId(
             props.vpos?.vehicle.vehicle.id
               ? `${props.agency}_${props.vpos.vehicle.vehicle.id}`
-              : null,
+              : "",
           )
         } // マーカークリックでInfoWindowFを開く
       />
-      {props.activeMarkerId ===
+      {trackingVehicleId ===
         `${props.agency}_${props.vpos?.vehicle.vehicle.id}` && (
         <InfoWindowF
           position={getPosition()} // マーカー座標を指定
           options={{
             pixelOffset: new window.google.maps.Size(0, -100), // マーカーとの相対位置を指定
           }}
-          onCloseClick={() => props.setActiveMarkerId(null)} // 閉じるときにリセット
+          onCloseClick={() => setTrackingVehicleId("")} // 閉じるときにリセット
         >
           <div>
             <VStack gap={1} padding="1">
