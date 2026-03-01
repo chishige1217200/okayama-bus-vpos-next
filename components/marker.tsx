@@ -1,55 +1,80 @@
 import { useFetchController } from "@/context/FetchContext";
+import { useTracking } from "@/context/TrackingContext";
 import { Agency, getVehicleStateUrl } from "@/types/agency";
 import { Routes, RoutesJp, Stops } from "@/types/gtfsFeed";
 import { Icon } from "@/types/icon";
 import { TripUpdate } from "@/types/tripUpdate";
 import { VposUpdate } from "@/types/vposUpdate";
+import { Link, Text, VStack } from "@chakra-ui/react";
 import { InfoWindowF, MarkerF, OverlayView } from "@react-google-maps/api";
 import React, { useCallback } from "react";
 import { useEffect, useState } from "react";
+import { LuExternalLink } from "react-icons/lu";
 
 type MarkerGroupProps = {
   agency: Agency;
-  activeMarkerId: string | null;
-  setActiveMarkerId: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 // 事業者毎に運行情報の取得を行う
 const MarkerGroup = (props: MarkerGroupProps) => {
   const fetchTripUpdate = async (agency: Agency) => {
     const response = await fetch(`/api/get_trip_update/?agency=${agency}`);
-    const data = await response.json();
-    setTripUpdateList(data);
+
+    if (response.ok) {
+      const data = await response.json();
+      setTripUpdateList(data);
+    }
+    // 通信エラー発生時は前の状態を維持する
   };
 
   const fetchVposUpdate = async (agency: Agency) => {
     const response = await fetch(`/api/get_vehicle_position/?agency=${agency}`);
-    const data = await response.json();
-    setVposUpdateList(data);
+
+    if (response.ok) {
+      const data = await response.json();
+      setVposUpdateList(data);
+    }
+    // 通信エラー発生時は前の状態を維持する
   };
 
   const fetchRoutes = async (agency: Agency) => {
     const response = await fetch(`/api/get_routes/?agency=${agency}`);
-    const data = await response.json();
-    setRoutesList(data);
+    if (response.ok) {
+      const data = await response.json();
+      setRoutesList(data);
+    } else {
+      setRoutesList([]);
+    }
   };
 
   const fetchRoutesJp = async (agency: Agency) => {
     const response = await fetch(`/api/get_routes_jp/?agency=${agency}`);
-    const data = await response.json();
-    setRoutesJpList(data);
+    if (response.ok) {
+      const data = await response.json();
+      setRoutesJpList(data);
+    } else {
+      setRoutesJpList([]);
+    }
   };
 
   const fetchStops = async (agency: Agency) => {
     const response = await fetch(`/api/get_stops/?agency=${agency}`);
-    const data = await response.json();
-    setStopsList(data);
+    if (response.ok) {
+      const data = await response.json();
+      setStopsList(data);
+    } else {
+      setStopsList([]);
+    }
   };
 
   const fetchIcon = async (agency: Agency) => {
     const response = await fetch(`/api/get_icon/?agency=${agency}`);
-    const data = await response.json();
-    setIconList(data);
+    if (response.ok) {
+      const data = await response.json();
+      setIconList(data);
+    } else {
+      setIconList([]);
+    }
   };
 
   const fetchStaticData = useCallback(async (agency: Agency) => {
@@ -62,10 +87,7 @@ const MarkerGroup = (props: MarkerGroupProps) => {
   }, []);
 
   const fetchRealtimeData = useCallback(async (agency: Agency) => {
-    await Promise.all([
-      fetchTripUpdate(agency),
-      fetchVposUpdate(agency),
-    ]);
+    await Promise.all([fetchTripUpdate(agency), fetchVposUpdate(agency)]);
   }, []);
 
   // FetchContextから必要な関数と状態を取得
@@ -95,12 +117,17 @@ const MarkerGroup = (props: MarkerGroupProps) => {
   useEffect(() => {
     if (!props.agency) return;
 
-    const interval = setInterval(() => {
-      fetchRealtimeData(props.agency);
+    const interval = setInterval(async () => {
+      start();
+      try {
+        await fetchRealtimeData(props.agency);
+      } finally {
+        finish();
+      }
     }, 20000);
 
     return () => clearInterval(interval);
-  }, [props.agency, fetchRealtimeData]);
+  }, [props.agency, start, finish, fetchRealtimeData]);
 
   // triggerが更新されたときに運行情報を再取得する
   useEffect(() => {
@@ -141,8 +168,6 @@ const MarkerGroup = (props: MarkerGroupProps) => {
                 stops={stopsList}
                 icon={iconList}
                 zIndex={Number(props.agency) * 100 + index}
-                activeMarkerId={props.activeMarkerId}
-                setActiveMarkerId={props.setActiveMarkerId}
               />
             </React.Fragment>
           ))
@@ -160,12 +185,12 @@ type MarkerProps = {
   stops: Stops[] | null;
   icon: Icon[] | null;
   zIndex: number;
-  activeMarkerId: string | null;
-  setActiveMarkerId: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 // 共通のマーカーコンポーネント
 const Marker = (props: MarkerProps) => {
+  const { trackingVehicleId, setTrackingVehicleId } = useTracking();
+
   const getPosition = (): google.maps.LatLngLiteral => {
     if (props.vpos) {
       return {
@@ -282,7 +307,7 @@ const Marker = (props: MarkerProps) => {
     }
 
     if (delay == null) {
-      return "遅れ情報が取得できません";
+      return "遅延情報取得不可";
     }
 
     if (delay === 0) {
@@ -357,47 +382,53 @@ const Marker = (props: MarkerProps) => {
             : undefined
         }
         onClick={() =>
-          props.setActiveMarkerId(
+          setTrackingVehicleId(
             props.vpos?.vehicle.vehicle.id
               ? `${props.agency}_${props.vpos.vehicle.vehicle.id}`
-              : null,
+              : "",
           )
         } // マーカークリックでInfoWindowFを開く
       />
-      {props.activeMarkerId ===
+      {trackingVehicleId ===
         `${props.agency}_${props.vpos?.vehicle.vehicle.id}` && (
         <InfoWindowF
           position={getPosition()} // マーカー座標を指定
           options={{
             pixelOffset: new window.google.maps.Size(0, -100), // マーカーとの相対位置を指定
           }}
-          onCloseClick={() => props.setActiveMarkerId(null)} // 閉じるときにリセット
+          onCloseClick={() => setTrackingVehicleId("")} // 閉じるときにリセット
         >
-          <div className="text-black">
-            <div className="font-medium text-center">{getRouteShortName()}</div>
-            <div className="text-center">
-              <p>{getLabel()}号車</p>
-              <p className="font-medium">次は {getNextStopName()}</p>
-              <p>{getDelay()}</p>
-              <p>{getOccupancyStatus()}</p>
-              <p>
-                {props.vpos ? (
-                  <a
-                    className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
-                    href={getVehicleStateUrl(
-                      props.agency,
-                      props.vpos.vehicle.vehicle.id,
-                    )}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    詳しい運行状況
-                  </a>
-                ) : (
-                  <></>
-                )}
-              </p>
-            </div>
+          <div>
+            <VStack gap={1} padding="1">
+              <Text fontWeight="medium">{getRouteShortName()}</Text>
+              <Text>{getLabel()}号車</Text>
+              <Text fontWeight="normal">
+                {getNextStopName()
+                  ? `次は ${getNextStopName()}`
+                  : "運行情報取得不可"}
+              </Text>
+              <Text>{getDelay()}</Text>
+              <Text>{getOccupancyStatus()}</Text>
+              {props.vpos ? (
+                <Link
+                  href={getVehicleStateUrl(
+                    props.agency,
+                    props.vpos.vehicle.vehicle.id,
+                  )}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  textDecoration="underline"
+                  color="blue.600"
+                  _hover={{ color: "blue.800" }}
+                  _visited={{ color: "purple.600" }}
+                >
+                  詳しい運行状況
+                  <LuExternalLink />
+                </Link>
+              ) : (
+                <></>
+              )}
+            </VStack>
           </div>
         </InfoWindowF>
       )}
