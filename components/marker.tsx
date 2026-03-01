@@ -310,7 +310,7 @@ const Marker = (props: MarkerProps) => {
     }
 
     if (delay == null) {
-      return "遅れ情報が取得できません";
+      return "遅延情報取得不可";
     }
 
     if (delay === 0) {
@@ -405,7 +405,11 @@ const Marker = (props: MarkerProps) => {
             <VStack gap={1} padding="1">
               <Text fontWeight="medium">{getRouteShortName()}</Text>
               <Text>{getLabel()}号車</Text>
-              <Text fontWeight="normal">次は {getNextStopName()}</Text>
+              <Text fontWeight="normal">
+                {getNextStopName()
+                  ? `次は ${getNextStopName()}`
+                  : "運行情報取得不可"}
+              </Text>
               <Text>{getDelay()}</Text>
               <Text>{getOccupancyStatus()}</Text>
               {props.vpos ? (
