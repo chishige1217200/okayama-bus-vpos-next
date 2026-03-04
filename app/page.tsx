@@ -2,7 +2,7 @@
 import Main from "@/components/main";
 import { useAgency } from "@/context/AgencyContext";
 import { Agency } from "@/types/agency";
-import { Box, Center, HStack, Link, Text } from "@chakra-ui/react";
+import { Box, Center, Link, Text } from "@chakra-ui/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -36,12 +36,19 @@ export default function Home() {
   return agreed ? (
     <Main />
   ) : (
-    <Center minH="100vh">
-      <Box textAlign="center" bg="bg.emphasized" padding={4} rounded={16}>
-        <Text>システムを利用するには、利用規約に同意する必要があります。</Text>
-
-        <HStack justify="center" mt={2}>
-          <Text>利用規約は</Text>
+    <Center minH="100dvh" px={{ base: 4, md: 6 }} py={{ base: 6, md: 10 }}>
+      <Box
+        borderWidth="1px"
+        borderRadius="md"
+        p={{ base: 4, md: 6 }}
+        maxH={{ base: "60vh", md: "65vh" }}
+        overflowY="auto"
+        bg="gray.50"
+        fontSize={{ base: "sm", md: "md" }}
+      >
+        <Text whiteSpace="pre-wrap" color="blackAlpha.900">
+          {`岡山バス位置情報サービスを利用するには、`}
+          <br />
           <Link
             href={"/terms"}
             textDecoration="underline"
@@ -49,9 +56,10 @@ export default function Home() {
             _hover={{ color: "blue.800" }}
             _visited={{ color: "purple.600" }}
           >
-            こちら
+            利用規約
           </Link>
-        </HStack>
+          {`に同意してください。`}
+        </Text>
       </Box>
     </Center>
   );
