@@ -3,6 +3,7 @@ import Main from "@/components/main";
 import { useAgency } from "@/context/AgencyContext";
 import { Agency } from "@/types/agency";
 import { Box, Center, Link, Text } from "@chakra-ui/react";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -46,6 +47,15 @@ export default function Home() {
         bg="gray.50"
         fontSize={{ base: "sm", md: "md" }}
       >
+        <Center>
+          <Image
+            src={"/logo192.png"}
+            alt="岡山バス位置情報サービス"
+            width={64}
+            height={64}
+            style={{ marginBottom: "1rem" }}
+          />
+        </Center>
         <Text whiteSpace="pre-wrap" color="blackAlpha.900">
           {`岡山バス位置情報サービスを利用するには、`}
           <br />
