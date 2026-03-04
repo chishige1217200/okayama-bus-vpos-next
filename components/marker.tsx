@@ -5,9 +5,16 @@ import { Routes, RoutesJp, Stops } from "@/types/gtfsFeed";
 import { Icon } from "@/types/icon";
 import { TripUpdate } from "@/types/tripUpdate";
 import { VposUpdate } from "@/types/vposUpdate";
-import { Link, Text, VStack } from "@chakra-ui/react";
+import {
+  Badge,
+  HStack,
+  Link,
+  Text,
+  useBreakpointValue,
+  VStack,
+} from "@chakra-ui/react";
 import { InfoWindowF, MarkerF, OverlayView } from "@react-google-maps/api";
-import React, { useCallback } from "react";
+import React, { JSX, useCallback } from "react";
 import { useEffect, useState } from "react";
 import { LuExternalLink } from "react-icons/lu";
 
@@ -191,6 +198,8 @@ type MarkerProps = {
 const Marker = (props: MarkerProps) => {
   const { trackingVehicleId, setTrackingVehicleId } = useTracking();
 
+  const isMobile = useBreakpointValue({ base: true, md: false });
+
   const getPosition = (): google.maps.LatLngLiteral => {
     if (props.vpos) {
       return {
@@ -206,9 +215,18 @@ const Marker = (props: MarkerProps) => {
       const routes = props.routes.find(
         (r) => r.route_id === props.vpos?.vehicle.trip.routeId,
       );
+
+      // _は半角空白に変換する
+      let routeShortName =
+        routes?.route_short_name.replace(/(\s|_)/g, " ") ?? "";
+      // モバイル端末の場合、改行を行い見やすくする
+      if (isMobile && routeShortName.length > 20) {
+        routeShortName = routeShortName.replaceAll("→", "\n↓\n");
+      }
+
       return props.agency !== Agency.RYOBI
         ? (routes?.route_long_name ?? "")
-        : (routes?.route_short_name ?? "");
+        : routeShortName;
     }
     return "";
   };
@@ -238,7 +256,7 @@ const Marker = (props: MarkerProps) => {
     return "";
   };
 
-  const getNextStopName = (): string => {
+  const getNextStopName = (): JSX.Element => {
     if (props.stops && props.trip && props.vpos) {
       // 現在のstopSequenceのインデックスを取得
       // stopSequenceと配列の添字が必ずしも一致しないことに注意する
@@ -251,25 +269,42 @@ const Marker = (props: MarkerProps) => {
         currentIndex !== -1 &&
         currentIndex + 1 < props.trip.tripUpdate.stopTimeUpdate.length
       ) {
-        return (
+        const stopName =
           props.stops.find(
             (s) =>
               s.stop_id ===
               props.trip?.tripUpdate.stopTimeUpdate[currentIndex + 1].stopId,
-          )?.stop_name ?? ""
+          )?.stop_name ?? "";
+        return (
+          <HStack gap={1} justifyContent="center">
+            <Text fontWeight="normal">{`次は `}</Text>
+            <Text
+              fontWeight="normal"
+              textDecorationLine="underline"
+            >{`${stopName}`}</Text>
+          </HStack>
         );
       }
 
       // 次のインデックスが存在しない場合は、現在のstopNameを返す
-      return (
+      const stopName =
         props.stops.find(
           (s) =>
             s.stop_id ===
             props.trip?.tripUpdate.stopTimeUpdate[currentIndex].stopId,
-        )?.stop_name ?? ""
+        )?.stop_name ?? "";
+
+      return (
+        <HStack gap={1} justifyContent="center">
+          <Text fontWeight="normal">{`次は `}</Text>
+          <Text
+            fontWeight="normal"
+            textDecorationLine="underline"
+          >{`${stopName}`}</Text>
+        </HStack>
       );
     }
-    return "";
+    return <Text fontWeight="normal">運行情報取得不可</Text>;
   };
 
   const getLabel = (): string => {
@@ -279,7 +314,7 @@ const Marker = (props: MarkerProps) => {
     return "";
   };
 
-  const getDelay = (): string => {
+  const getDelay = (): JSX.Element => {
     let delay = null;
     if (props.trip && props.vpos) {
       // 現在のstopSequenceのインデックスを取得
@@ -307,32 +342,36 @@ const Marker = (props: MarkerProps) => {
     }
 
     if (delay == null) {
-      return "遅延情報取得不可";
+      return <Badge>遅延情報取得不可</Badge>;
     }
 
     if (delay === 0) {
-      return "ほぼ定刻";
+      return <Badge colorPalette="green">ほぼ定刻</Badge>;
     }
 
-    return `約${delay}分遅れ`;
+    if (delay < 15) {
+      return <Badge colorPalette="blue">約{delay}分遅れ</Badge>;
+    }
+
+    return <Badge colorPalette="red">約{delay}分遅れ</Badge>;
   };
 
-  const getOccupancyStatus = (): string => {
+  const getOccupancyStatus = (): JSX.Element => {
     if (props.vpos) {
       switch (props.vpos.vehicle.occupancyStatus) {
         case "EMPTY":
-          return "乗車率0%";
+          return <Badge colorPalette="yellow">乗車率0%</Badge>;
         case "MANY_SEATS_AVAILABLE":
-          return "乗車率50%未満";
+          return <Badge colorPalette="green">乗車率50%未満</Badge>;
         case "STANDING_ROOM_ONLY":
-          return "乗車率50%~80%";
+          return <Badge colorPalette="blue">乗車率50%~80%</Badge>;
         case "FULL":
-          return "乗車率80%以上";
+          return <Badge colorPalette="red">乗車率80%以上</Badge>;
         default:
-          return "乗車率取得不可";
+          return <Badge>乗車率取得不可</Badge>;
       }
     }
-    return "";
+    return <Badge>乗車率取得不可</Badge>;
   };
 
   const getIcon = (): string => {
@@ -399,16 +438,20 @@ const Marker = (props: MarkerProps) => {
           onCloseClick={() => setTrackingVehicleId("")} // 閉じるときにリセット
         >
           <div>
-            <VStack gap={1} padding="1">
-              <Text fontWeight="medium">{getRouteShortName()}</Text>
-              <Text>{getLabel()}号車</Text>
-              <Text fontWeight="normal">
-                {getNextStopName()
-                  ? `次は ${getNextStopName()}`
-                  : "運行情報取得不可"}
+            <VStack gap={0.5} padding="1">
+              <Text
+                fontWeight="medium"
+                textAlign="center"
+                whiteSpace="pre-wrap"
+              >
+                {getRouteShortName()}
               </Text>
-              <Text>{getDelay()}</Text>
-              <Text>{getOccupancyStatus()}</Text>
+              <Badge>{getLabel()}号車</Badge>
+              {getNextStopName()}
+              <HStack gap={1} justifyContent="center">
+                {getDelay()}
+                {getOccupancyStatus()}
+              </HStack>
               {props.vpos ? (
                 <Link
                   href={getVehicleStateUrl(
