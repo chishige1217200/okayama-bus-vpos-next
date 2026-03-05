@@ -2,8 +2,7 @@
 import Main from "@/components/main";
 import { useAgency } from "@/context/AgencyContext";
 import { Agency } from "@/types/agency";
-import { Box, Center, Link, Text } from "@chakra-ui/react";
-import Image from "next/image";
+import { Box, Center, Image, Link, Text } from "@chakra-ui/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -51,9 +50,18 @@ export default function Home() {
           <Image
             src={"/logo192.png"}
             alt="岡山バス位置情報サービス"
-            width={64}
-            height={64}
+            height={20}
             style={{ marginBottom: "1rem" }}
+          />
+        </Center>
+        <Center gap={1} mb={4}>
+          <Text fontSize="lg" fontWeight="bold" color="blackAlpha.900">
+            岡山バス位置情報サービス
+          </Text>
+          <Image
+            src="/next.svg"
+            alt="Next.js logo"
+            height={4}
           />
         </Center>
         <Text whiteSpace="pre-wrap" color="blackAlpha.900">
