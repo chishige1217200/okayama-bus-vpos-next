@@ -26,8 +26,8 @@ export default function TermsPage() {
     router.push("/");
   };
 
-  const termsText = `この利用規約は、このウェブサイト上で提供する岡山バス位置情報サービス（以下、「本サービス」と言います。）の利用条件を定めるものです。
-利用者の皆さまには、利用規約に従って、本サービスをご利用いただきます。
+  const termsText = `　この利用規約は、このウェブサイト上で提供する岡山バス位置情報サービス（以下、「本サービス」と言います。）の利用条件を定めるものです。
+　利用者の皆さまには、利用規約に従って、本サービスをご利用いただきます。
 
 第1条（保証の否認および免責事項）
 　1. 本サービスをご利用された結果、あるいは利用できない等により直接的または間接的に生じたあらゆる損害、損失については、本サービス管理者および各バス事業者は一切の責任を負いません。
@@ -80,7 +80,7 @@ export default function TermsPage() {
             <Text whiteSpace="pre-wrap" color="blackAlpha.900">
               {termsText}
               <br />
-              {"\n"}本サービスの提供には、
+              {"\n"}　本サービスの提供には、
               <Link
                 href="https://loc.bus-vision.jp/ryobi/view/opendata.html"
                 color="blue.600"
@@ -90,10 +90,10 @@ export default function TermsPage() {
               >
                 Bus-Vision
               </Link>
-              オープンデータを使用しています。
+              　オープンデータを使用しています。
               {"\n"}
-              本サービス管理者と各バス事業者との間に関係はありません。本サービスに関するお問い合わせを各バス事業者へ行うことはご遠慮ください。
-              {"\n"}対象のバス事業者：
+              　本サービス管理者と各バス事業者との間に関係はありません。本サービスに関する問い合わせを各バス事業者へ行うことはご遠慮ください。
+              {"\n"}　対象のバス事業者：
               <Link
                 href="https://www.ryobi-holdings.jp/bus/"
                 color="blue.600"
@@ -121,6 +121,17 @@ export default function TermsPage() {
               >
                 八晃運輸
               </Link>
+              {"\n\n"}　当サイトの
+              <Link
+                href="https://www.illust-box.jp/sozai/131203/"
+                color="blue.600"
+                textDecoration="underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                ロゴ
+              </Link>
+              はお借りしています。この場を借りてお礼申し上げます。
             </Text>
           </Box>
 
