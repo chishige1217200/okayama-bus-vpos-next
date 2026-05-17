@@ -7,7 +7,7 @@ import "./main.css";
 import { Maximize, RotateCw, Search } from "lucide-react";
 import { GoogleMap, LoadScript, OverlayView } from "@react-google-maps/api";
 import Image from "next/image";
-import MarkerGroup from "./marker";
+import MarkerGroup from "./Marker";
 import { useFetchController } from "@/context/FetchContext";
 import { useAgency } from "@/context/AgencyContext";
 import { CloseButton, IconButton } from "@chakra-ui/react/button";

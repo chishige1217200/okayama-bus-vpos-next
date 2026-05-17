@@ -53,3 +53,10 @@ export const getVehicleStateUrl = (
 ): string => {
   return `https://loc.bus-vision.jp/ryobi/view/vehicleState.html?vehicleCorpCd=${agency}&vehicleCd=${vehicleCd}&lang=0`;
 };
+
+export const getVehicleTrackingParam = (
+  agency: Agency,
+  vehicleCd: string,
+): string => {
+  return `?tracking_vehicle=${agency}_${vehicleCd}`;
+};
