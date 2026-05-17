@@ -1,6 +1,7 @@
 "use client";
 import Main from "@/components/main";
 import { useAgency } from "@/context/AgencyContext";
+import { useTracking } from "@/context/TrackingContext";
 import { Agency } from "@/types/agency";
 import { Box, Center, Image, Link, Text } from "@chakra-ui/react";
 import { useSearchParams } from "next/navigation";
@@ -15,11 +16,13 @@ export default function Home() {
   });
 
   const { setSearchAgencies } = useAgency();
+  const { setTrackingVehicleId } = useTracking();
   const searchParams = useSearchParams();
 
   const okaden = Boolean(searchParams.get("okaden")?.toLowerCase() !== "false");
   const ryobi = Boolean(searchParams.get("ryobi")?.toLowerCase() !== "false");
   const hakkou = Boolean(searchParams.get("hakkou")?.toLowerCase() !== "false");
+  const trackingVehicle = searchParams.get("tracking_vehicle") || undefined;
 
   const agencyArray = useMemo(() => {
     const array: Agency[] = [];
@@ -32,6 +35,12 @@ export default function Home() {
   useEffect(() => {
     setSearchAgencies(agencyArray);
   }, [agencyArray, setSearchAgencies]);
+
+  useEffect(() => {
+    if (trackingVehicle) {
+      setTrackingVehicleId(trackingVehicle);
+    }
+  }, [trackingVehicle]);
 
   return agreed ? (
     <Main />
@@ -58,11 +67,7 @@ export default function Home() {
           <Text fontSize="lg" fontWeight="bold" color="blackAlpha.900">
             岡山バス位置情報サービス
           </Text>
-          <Image
-            src="/next.svg"
-            alt="Next.js logo"
-            height={4}
-          />
+          <Image src="/next.svg" alt="Next.js logo" height={4} />
         </Center>
         <Text whiteSpace="pre-wrap" color="blackAlpha.900">
           {`岡山バス位置情報サービスを利用するには、`}
