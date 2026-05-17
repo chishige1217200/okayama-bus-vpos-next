@@ -28,13 +28,11 @@ export function AgencyProvider({ children }: { children: React.ReactNode }) {
       searchAgencies,
       setSearchAgencies,
     }),
-    [searchAgencies, setSearchAgencies]
+    [searchAgencies, setSearchAgencies],
   );
 
   return (
-    <AgencyContext.Provider value={value}>
-      {children}
-    </AgencyContext.Provider>
+    <AgencyContext.Provider value={value}>{children}</AgencyContext.Provider>
   );
 }
 

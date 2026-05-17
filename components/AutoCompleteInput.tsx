@@ -1,0 +1,77 @@
+"use client";
+
+import {
+  Box,
+  CloseButton,
+  Input,
+  InputGroup,
+  List,
+  ListItem,
+} from "@chakra-ui/react";
+import { useMemo, useState } from "react";
+
+type Props = {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+  options: string[];
+};
+
+export default function AutoCompleteInput({
+  value,
+  onChange,
+  placeholder,
+  options,
+}: Props) {
+  const [open, setOpen] = useState(false);
+
+  const filtered = useMemo(() => {
+    if (!value) return options.slice(0, 10);
+    return options.filter((o) => o.includes(value)).slice(0, 10);
+  }, [value, options]);
+
+  return (
+    <Box position="relative" className="flex items-center">
+      <InputGroup endElement={<CloseButton onClick={() => onChange("")} />}>
+        <Input
+          value={value}
+          placeholder={placeholder}
+          bg="blackAlpha.300"
+          onChange={(e) => {
+            onChange(e.target.value);
+            setOpen(true);
+          }}
+          onFocus={() => setTimeout(() => setOpen(true), 150)}
+          onBlur={() => setTimeout(() => setOpen(false), 150)}
+        />
+      </InputGroup>
+
+      {open && filtered.length > 0 && (
+        <List.Root
+          position="absolute"
+          bg="black"
+          w="100%"
+          mt={1}
+          borderRadius="md"
+          boxShadow="md"
+          zIndex={20}
+          maxH="200px"
+          overflowY="auto"
+        >
+          {filtered.map((item) => (
+            <ListItem
+              key={item}
+              px={3}
+              py={2}
+              cursor="pointer"
+              _hover={{ bg: "gray.700" }}
+              onMouseDown={() => onChange(item)}
+            >
+              {item}
+            </ListItem>
+          ))}
+        </List.Root>
+      )}
+    </Box>
+  );
+}

@@ -1,94 +1,45 @@
 "use client";
 
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useMemo,
-  useCallback,
-} from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 
-type SearchContextType = {
-  searchVehicleName: string;
-  setSearchVehicleName: (name: string) => void;
-  fromStopName: string;
-  setFromStopName: (name: string) => void;
-  viaStopName: string;
-  setViaStopName: (name: string) => void;
-  toStopName: string;
-  setToStopName: (name: string) => void;
-  routeName: string;
-  setRouteName: (name: string) => void;
+export type SearchState = {
+  agencies: string[];
+  search_vehicle: string;
+  from_stop: string;
+  via_stop: string;
+  to_stop: string;
+  route: string;
 };
 
-const SearchContext = createContext<SearchContextType | null>(null);
+const createDefaultState = (): SearchState => ({
+  agencies: ["2", "3", "5"],
+  search_vehicle: "",
+  from_stop: "",
+  via_stop: "",
+  to_stop: "",
+  route: "",
+});
 
-export function SearchProvider({ children }: { children: React.ReactNode }) {
-  // 号車検索
-  const [searchVehicleName, setSearchVehicleNameState] = useState("");
-  // 出発地検索
-  const [fromStopName, setFromStopNameState] = useState("");
-  // 経由地検索
-  const [viaStopName, setViaStopNameState] = useState("");
-  // 到着地検索
-  const [toStopName, setToStopNameState] = useState("");
-  // 路線名検索
-  const [routeName, setRouteNameState] = useState("");
+const SearchContext = createContext<{
+  state: SearchState;
+  setState: (v: SearchState) => void;
+  clear: () => void;
+} | null>(null);
 
-  const setSearchVehicleName = useCallback((name: string) => {
-    setSearchVehicleNameState(name);
-  }, []);
+export function SearchProvider({ children }: { children: ReactNode }) {
+  const [state, setState] = useState<SearchState>(createDefaultState);
 
-  const setFromStopName = useCallback((name: string) => {
-    setFromStopNameState(name);
-  }, []);
-
-  const setViaStopName = useCallback((name: string) => {
-    setViaStopNameState(name);
-  }, []);
-
-  const setToStopName = useCallback((name: string) => {
-    setToStopNameState(name);
-  }, []);
-
-  const setRouteName = useCallback((name: string) => {
-    setRouteNameState(name);
-  }, []);
-
-  const value = useMemo(
-    () => ({
-      searchVehicleName,
-      setSearchVehicleName,
-      fromStopName,
-      setFromStopName,
-      viaStopName,
-      setViaStopName,
-      toStopName,
-      setToStopName,
-      routeName,
-      setRouteName,
-    }),
-    [
-      searchVehicleName,
-      setSearchVehicleName,
-      fromStopName,
-      setFromStopName,
-      viaStopName,
-      setViaStopName,
-      toStopName,
-      setToStopName,
-      routeName,
-      setRouteName,
-    ],
-  );
+  const clear = () => setState(createDefaultState);
 
   return (
-    <SearchContext.Provider value={value}>{children}</SearchContext.Provider>
+    <SearchContext.Provider value={{ state, setState, clear }}>
+      {children}
+    </SearchContext.Provider>
   );
 }
 
 export function useSearch() {
   const ctx = useContext(SearchContext);
-  if (!ctx) throw new Error("useSearch must be used within SearchProvider");
+  if (!ctx) throw new Error("useSearch must be used within provider");
   return ctx;
 }
