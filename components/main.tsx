@@ -78,9 +78,8 @@ const Main = () => {
                 top: 10,
                 right: 10,
                 display: "flex",
-                gap: "8px",
+                gap: "10px",
                 zIndex: 5,
-                color: "white",
               }}
             >
               {/* 検索ボタン */}
