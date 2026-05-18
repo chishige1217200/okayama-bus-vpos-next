@@ -15,7 +15,7 @@ const CopyLink = ({
 
   const [url, setUrl] = useState("");
   useEffect(() => {
-    setUrl(window.location.href);
+    setUrl(new URL(window.location.href).origin);
   }, []);
 
   return (
