@@ -3,7 +3,6 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
 export type SearchState = {
-  agencies: string[];
   search_vehicle: string;
   from_stop: string;
   via_stop: string;
@@ -12,7 +11,6 @@ export type SearchState = {
 };
 
 const createDefaultState = (): SearchState => ({
-  agencies: ["2", "3", "5"],
   search_vehicle: "",
   from_stop: "",
   via_stop: "",

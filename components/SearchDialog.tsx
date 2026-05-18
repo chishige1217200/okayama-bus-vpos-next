@@ -14,13 +14,13 @@ import { useSearch } from "@/context/SearchContext";
 import AutoCompleteInput from "./AutoCompleteInput";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useAgency } from "@/context/AgencyContext";
-import { getAgencyName } from "@/types/agency";
+import { Agency, availableAgencies, getAgencyName } from "@/types/agency";
 
 const stopOptions = ["岡山駅", "天満屋", "表町"]; // ← 実データに置換
 const routeOptions = ["1系統", "2系統"];
 
 export default function SearchForm() {
-  const { searchAgencies } = useAgency();
+  const { searchAgencies, setSearchAgencies } = useAgency();
   const { state, setState, clear } = useSearch();
 
   // ⭐ debounce
@@ -35,14 +35,14 @@ export default function SearchForm() {
       <Field.Root>
         <Field.Label>事業者</Field.Label>
         <CheckboxGroup
-          value={state.agencies}
+          value={searchAgencies}
           onValueChange={(v) => {
             console.log("Selected agencies:", v);
-            setState({ ...state, agencies: v });
+            setSearchAgencies(v as Agency[]);
           }}
         >
           <HStack>
-            {searchAgencies.map((value, index) => {
+            {availableAgencies.map((value, index) => {
               const id = `agency-${value}-${index}`;
 
               return (

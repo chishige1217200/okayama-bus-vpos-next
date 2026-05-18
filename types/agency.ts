@@ -6,6 +6,8 @@ export enum Agency {
   HAKKOU = "5", // 八晃運輸
 }
 
+export const availableAgencies = [Agency.OKADEN, Agency.RYOBI, Agency.HAKKOU];
+
 export const getAgencyName = (agency: Agency): string => {
   switch (agency) {
     case Agency.OKAKIDO:
