@@ -19,6 +19,8 @@ export default function Home() {
   const { setTrackingVehicleId } = useTracking();
   const searchParams = useSearchParams();
 
+  // クエリパラメータの解析
+  // 現在システムで利用可能な事業者はagency.tsを参照
   const okaden = Boolean(searchParams.get("okaden")?.toLowerCase() !== "false");
   const ryobi = Boolean(searchParams.get("ryobi")?.toLowerCase() !== "false");
   const hakkou = Boolean(searchParams.get("hakkou")?.toLowerCase() !== "false");
@@ -40,7 +42,7 @@ export default function Home() {
     if (trackingVehicle) {
       setTrackingVehicleId(trackingVehicle);
     }
-  }, [trackingVehicle]);
+  }, [trackingVehicle, setTrackingVehicleId]);
 
   return agreed ? (
     <Main />

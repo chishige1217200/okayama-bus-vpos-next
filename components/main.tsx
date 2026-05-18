@@ -4,15 +4,16 @@ import { useEffect, useRef, useState } from "react";
 // Ignore missing type declarations for CSS import
 // @ts-ignore
 import "./main.css";
-import { Maximize, RotateCw, Search } from "lucide-react";
+import { Info, Maximize, RotateCw, Search } from "lucide-react";
 import { GoogleMap, LoadScript, OverlayView } from "@react-google-maps/api";
 import Image from "next/image";
 import MarkerGroup from "./Marker";
 import { useFetchController } from "@/context/FetchContext";
 import { useAgency } from "@/context/AgencyContext";
 import { CloseButton, IconButton } from "@chakra-ui/react/button";
-import { Dialog, Portal, Theme } from "@chakra-ui/react";
+import { Dialog, Link, Portal, Theme } from "@chakra-ui/react";
 import SearchForm from "./SearchDialog";
+import { toaster } from "./ui/toaster";
 
 const Main = () => {
   const { fire, isLoading } = useFetchController(); // ローディング状態をFetchContextから取得
@@ -40,6 +41,12 @@ const Main = () => {
   };
 
   useEffect(() => {
+    toaster.create({
+      description: "全画面表示にするとスムーズにスクロールできます。",
+      type: "info",
+      closable: true,
+    });
+
     console.log("Fetching user location...");
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -82,6 +89,28 @@ const Main = () => {
                 zIndex: 5,
               }}
             >
+              {/* 利用規約ボタン */}
+
+              <Link href="/terms">
+                <IconButton
+                  h="40px"
+                  w="40px"
+                  bg="white"
+                  color="black"
+                  border="0"
+                  borderRadius="2px"
+                  boxShadow="0px 1px 4px -1px rgba(0, 0, 0, 0.3)"
+                  overflow="hidden"
+                  cursor="pointer"
+                  userSelect="none"
+                  textTransform="none"
+                  _hover={{ bg: "white" }}
+                  _active={{ bg: "gray.100" }}
+                >
+                  <Info />
+                </IconButton>
+              </Link>
+
               {/* 検索ボタン */}
               <IconButton
                 onClick={() => {

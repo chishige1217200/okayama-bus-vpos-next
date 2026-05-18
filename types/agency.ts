@@ -6,6 +6,7 @@ export enum Agency {
   HAKKOU = "5", // 八晃運輸
 }
 
+// 現在システムで利用可能な事業者を管理
 export const availableAgencies = [Agency.OKADEN, Agency.RYOBI, Agency.HAKKOU];
 
 export const getAgencyName = (agency: Agency): string => {
