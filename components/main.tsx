@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+// Ignore missing type declarations for CSS import
+// @ts-ignore
 import "./main.css";
-import { Maximize, RotateCw } from "lucide-react";
+import { Maximize, RotateCw, Search } from "lucide-react";
 import { GoogleMap, LoadScript, OverlayView } from "@react-google-maps/api";
 import Image from "next/image";
-import MarkerGroup from "./marker";
+import MarkerGroup from "./Marker";
 import { useFetchController } from "@/context/FetchContext";
 import { useAgency } from "@/context/AgencyContext";
-import { IconButton } from "@chakra-ui/react/button";
-import { Theme } from "@chakra-ui/react";
+import { CloseButton, IconButton } from "@chakra-ui/react/button";
+import { Dialog, Portal, Theme } from "@chakra-ui/react";
+import SearchForm from "./SearchDialog";
 
 const Main = () => {
   const { fire, isLoading } = useFetchController(); // ローディング状態をFetchContextから取得
@@ -20,22 +23,9 @@ const Main = () => {
   }); // 初期値
   const [userLocation, setUserLocation] =
     useState<google.maps.LatLngLiteral | null>(null); // ユーザーの現在地
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // ダイアログの開閉状態
 
   const mapWrapperRef = useRef<HTMLDivElement>(null);
-
-  const [isFullscreen, setIsFullscreen] = useState(false);
-
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-
-    return () => {
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
-    };
-  }, []);
 
   const toggleFullscreen = async () => {
     if (!document.fullscreenElement) {
@@ -43,6 +33,10 @@ const Main = () => {
     } else {
       await document.exitFullscreen();
     }
+  };
+
+  const deactivateFullscreen = async () => {
+    await document.exitFullscreen();
   };
 
   useEffect(() => {
@@ -84,11 +78,33 @@ const Main = () => {
                 top: 10,
                 right: 10,
                 display: "flex",
-                gap: "8px",
+                gap: "10px",
                 zIndex: 5,
-                color: "white",
               }}
             >
+              {/* 検索ボタン */}
+              <IconButton
+                onClick={() => {
+                  setIsDialogOpen(true);
+                  deactivateFullscreen();
+                }}
+                h="40px"
+                w="40px"
+                bg="white"
+                color="black"
+                border="0"
+                borderRadius="2px"
+                boxShadow="0px 1px 4px -1px rgba(0, 0, 0, 0.3)"
+                overflow="hidden"
+                cursor="pointer"
+                userSelect="none"
+                textTransform="none"
+                _hover={{ bg: "white" }}
+                _active={{ bg: "gray.100" }}
+              >
+                <Search />
+              </IconButton>
+
               {/* 更新ボタン */}
               <IconButton
                 onClick={fire}
@@ -159,6 +175,39 @@ const Main = () => {
                 <MarkerGroup key={agency} agency={agency} />
               ))}
             </GoogleMap>
+
+            <Theme>
+              <Dialog.Root
+                closeOnInteractOutside={false}
+                modal={false}
+                open={isDialogOpen}
+                onOpenChange={(e) => setIsDialogOpen(e.open)}
+                placement={"bottom"}
+                motionPreset={"slide-in-bottom"}
+              >
+                <Portal>
+                  <Dialog.Backdrop />
+                  <Dialog.Positioner pointerEvents="none">
+                    <Dialog.Content>
+                      <Dialog.Header>
+                        <Dialog.Title>絞り込み検索</Dialog.Title>
+                      </Dialog.Header>
+                      <Dialog.Body>
+                        <SearchForm />
+                      </Dialog.Body>
+                      {/* <Dialog.Footer>
+                        <Dialog.ActionTrigger asChild>
+                          <Button>閉じる</Button>
+                        </Dialog.ActionTrigger>
+                      </Dialog.Footer> */}
+                      <Dialog.CloseTrigger asChild>
+                        <CloseButton size="sm" />
+                      </Dialog.CloseTrigger>
+                    </Dialog.Content>
+                  </Dialog.Positioner>
+                </Portal>
+              </Dialog.Root>
+            </Theme>
           </div>
         </LoadScript>
       </Theme>

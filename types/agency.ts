@@ -6,6 +6,23 @@ export enum Agency {
   HAKKOU = "5", // 八晃運輸
 }
 
+export const availableAgencies = [Agency.OKADEN, Agency.RYOBI, Agency.HAKKOU];
+
+export const getAgencyName = (agency: Agency): string => {
+  switch (agency) {
+    case Agency.OKAKIDO:
+      return "岡山電気軌道";
+    case Agency.OKADEN:
+      return "岡電バス";
+    case Agency.RYOBI:
+      return "両備バス";
+    case Agency.CHUTETSU:
+      return "中鉄バス";
+    case Agency.HAKKOU:
+      return "八晃運輸";
+  }
+};
+
 export const getTripUpdateUrl = (agency: Agency): string => {
   switch (agency) {
     case Agency.OKADEN:
@@ -34,7 +51,14 @@ export const getVehiclePositionUrl = (agency: Agency): string => {
 
 export const getVehicleStateUrl = (
   agency: Agency,
-  vehicleCd: string
+  vehicleCd: string,
 ): string => {
   return `https://loc.bus-vision.jp/ryobi/view/vehicleState.html?vehicleCorpCd=${agency}&vehicleCd=${vehicleCd}&lang=0`;
+};
+
+export const getVehicleTrackingParam = (
+  agency: Agency,
+  vehicleCd: string,
+): string => {
+  return `?tracking_vehicle=${agency}_${vehicleCd}`;
 };

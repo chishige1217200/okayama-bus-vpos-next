@@ -1,6 +1,10 @@
 import { useFetchController } from "@/context/FetchContext";
 import { useTracking } from "@/context/TrackingContext";
-import { Agency, getVehicleStateUrl } from "@/types/agency";
+import {
+  Agency,
+  getVehicleStateUrl,
+  getVehicleTrackingParam,
+} from "@/types/agency";
 import { Routes, RoutesJp, Stops } from "@/types/gtfsFeed";
 import { Icon } from "@/types/icon";
 import { TripUpdate } from "@/types/tripUpdate";
@@ -16,7 +20,8 @@ import {
 import { InfoWindowF, MarkerF, OverlayView } from "@react-google-maps/api";
 import React, { JSX, useCallback } from "react";
 import { useEffect, useState } from "react";
-import { LuExternalLink } from "react-icons/lu";
+import { LuExternalLink, LuShare2 } from "react-icons/lu";
+import CopyLink from "./CopyLink";
 
 type MarkerGroupProps = {
   agency: Agency;
@@ -453,21 +458,27 @@ const Marker = (props: MarkerProps) => {
                 {getOccupancyStatus()}
               </HStack>
               {props.vpos ? (
-                <Link
-                  href={getVehicleStateUrl(
-                    props.agency,
-                    props.vpos.vehicle.vehicle.id,
-                  )}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  textDecoration="underline"
-                  color="blue.600"
-                  _hover={{ color: "blue.800" }}
-                  _visited={{ color: "purple.600" }}
-                >
-                  詳しい運行状況
-                  <LuExternalLink />
-                </Link>
+                <>
+                  <Link
+                    href={getVehicleStateUrl(
+                      props.agency,
+                      props.vpos.vehicle.vehicle.id,
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    textDecoration="underline"
+                    color="blue.600"
+                    _hover={{ color: "blue.800" }}
+                    _visited={{ color: "purple.600" }}
+                  >
+                    詳しい運行状況
+                    <LuExternalLink />
+                  </Link>
+                  <CopyLink copyText={getVehicleTrackingParam(props.agency, props.vpos.vehicle.vehicle.id)}>
+                    位置情報を共有
+                    <LuShare2 />
+                  </CopyLink>
+                </>
               ) : (
                 <></>
               )}
