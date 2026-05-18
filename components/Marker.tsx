@@ -17,7 +17,6 @@ import {
   useBreakpointValue,
   VStack,
 } from "@chakra-ui/react";
-import { toaster } from "@/components/ui/toaster"
 import { InfoWindowF, MarkerF, OverlayView } from "@react-google-maps/api";
 import React, { JSX, useCallback } from "react";
 import { useEffect, useState } from "react";

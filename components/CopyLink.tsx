@@ -1,5 +1,4 @@
 "use client";
-import { usePathname } from "next/navigation";
 import { useClipboardCopy } from "@/hooks/useClipboardCopy";
 import { toaster } from "./ui/toaster";
 import { Link } from "@chakra-ui/react";

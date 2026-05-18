@@ -8,7 +8,6 @@ import {
   Button,
   Field,
   Center,
-  For,
 } from "@chakra-ui/react";
 import { useSearch } from "@/context/SearchContext";
 import AutoCompleteInput from "./AutoCompleteInput";
