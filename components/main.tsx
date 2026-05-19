@@ -14,6 +14,7 @@ import { CloseButton, IconButton } from "@chakra-ui/react/button";
 import { Dialog, Link, Portal, Theme } from "@chakra-ui/react";
 import SearchForm from "./SearchDialog";
 import { toaster } from "./ui/toaster";
+import { Tooltip } from "./ui/tooltip";
 
 const Main = () => {
   const { fire, isLoading } = useFetchController(); // ローディング状態をFetchContextから取得
@@ -93,7 +94,34 @@ const Main = () => {
               {/* 利用規約ボタン */}
 
               <Link href="/terms">
+                <Tooltip content="利用規約">
+                  <IconButton
+                    h="40px"
+                    w="40px"
+                    bg="white"
+                    color="black"
+                    border="0"
+                    borderRadius="2px"
+                    boxShadow="0px 1px 4px -1px rgba(0, 0, 0, 0.3)"
+                    overflow="hidden"
+                    cursor="pointer"
+                    userSelect="none"
+                    textTransform="none"
+                    _hover={{ bg: "white" }}
+                    _active={{ bg: "gray.100" }}
+                  >
+                    <Info />
+                  </IconButton>
+                </Tooltip>
+              </Link>
+
+              {/* 検索ボタン */}
+              <Tooltip content="検索">
                 <IconButton
+                  onClick={() => {
+                    setIsDialogOpen(true);
+                    deactivateFullscreen();
+                  }}
                   h="40px"
                   w="40px"
                   bg="white"
@@ -108,70 +136,51 @@ const Main = () => {
                   _hover={{ bg: "white" }}
                   _active={{ bg: "gray.100" }}
                 >
-                  <Info />
+                  <Search />
                 </IconButton>
-              </Link>
-
-              {/* 検索ボタン */}
-              <IconButton
-                onClick={() => {
-                  setIsDialogOpen(true);
-                  deactivateFullscreen();
-                }}
-                h="40px"
-                w="40px"
-                bg="white"
-                color="black"
-                border="0"
-                borderRadius="2px"
-                boxShadow="0px 1px 4px -1px rgba(0, 0, 0, 0.3)"
-                overflow="hidden"
-                cursor="pointer"
-                userSelect="none"
-                textTransform="none"
-                _hover={{ bg: "white" }}
-                _active={{ bg: "gray.100" }}
-              >
-                <Search />
-              </IconButton>
+              </Tooltip>
 
               {/* 更新ボタン */}
-              <IconButton
-                onClick={fire}
-                disabled={isLoading}
-                h="40px"
-                w="40px"
-                bg="white"
-                color="black"
-                border="0"
-                borderRadius="2px"
-                boxShadow="0px 1px 4px -1px rgba(0, 0, 0, 0.3)"
-                overflow="hidden"
-                cursor="pointer"
-                userSelect="none"
-                textTransform="none"
-                _hover={{ bg: "white" }}
-                _active={{ bg: "gray.100" }}
-                loading={isLoading}
-              >
-                <RotateCw />
-              </IconButton>
+              <Tooltip content="更新">
+                <IconButton
+                  onClick={fire}
+                  disabled={isLoading}
+                  h="40px"
+                  w="40px"
+                  bg="white"
+                  color="black"
+                  border="0"
+                  borderRadius="2px"
+                  boxShadow="0px 1px 4px -1px rgba(0, 0, 0, 0.3)"
+                  overflow="hidden"
+                  cursor="pointer"
+                  userSelect="none"
+                  textTransform="none"
+                  _hover={{ bg: "white" }}
+                  _active={{ bg: "gray.100" }}
+                  loading={isLoading}
+                >
+                  <RotateCw />
+                </IconButton>
+              </Tooltip>
 
               {/* 最大化ボタン */}
-              <IconButton
-                onClick={toggleFullscreen}
-                h="40px"
-                w="40px"
-                bg="white"
-                color="black"
-                border="0"
-                borderRadius="2px"
-                boxShadow="0px 1px 4px -1px rgba(0, 0, 0, 0.3)"
-                _hover={{ bg: "white" }}
-                _active={{ bg: "gray.100" }}
-              >
-                <Maximize />
-              </IconButton>
+              <Tooltip content="最大化">
+                <IconButton
+                  onClick={toggleFullscreen}
+                  h="40px"
+                  w="40px"
+                  bg="white"
+                  color="black"
+                  border="0"
+                  borderRadius="2px"
+                  boxShadow="0px 1px 4px -1px rgba(0, 0, 0, 0.3)"
+                  _hover={{ bg: "white" }}
+                  _active={{ bg: "gray.100" }}
+                >
+                  <Maximize />
+                </IconButton>
+              </Tooltip>
             </div>
             <GoogleMap
               mapContainerStyle={{
