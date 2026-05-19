@@ -41,12 +41,6 @@ const Main = () => {
   };
 
   useEffect(() => {
-    toaster.create({
-      description: "全画面表示にするとスムーズにスクロールできます。",
-      type: "info",
-      closable: true,
-    });
-
     console.log("Fetching user location...");
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -69,6 +63,13 @@ const Main = () => {
       <Theme appearance="light">
         <LoadScript
           googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY ?? ""}
+          onLoad={() =>
+            toaster.create({
+              description: "全画面表示にするとスムーズにスクロールできます。",
+              type: "info",
+              closable: true,
+            })
+          }
         >
           <div
             ref={mapWrapperRef}
