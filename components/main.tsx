@@ -40,13 +40,19 @@ const Main = () => {
     await document.exitFullscreen();
   };
 
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
+
   useEffect(() => {
+    if (!isMapLoaded) return;
+
     toaster.create({
       description: "全画面表示にするとスムーズにスクロールできます。",
       type: "info",
       closable: true,
     });
+  }, [isMapLoaded]);
 
+  useEffect(() => {
     console.log("Fetching user location...");
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -69,6 +75,7 @@ const Main = () => {
       <Theme appearance="light">
         <LoadScript
           googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY ?? ""}
+          onLoad={() => setIsMapLoaded(true)}
         >
           <div
             ref={mapWrapperRef}
