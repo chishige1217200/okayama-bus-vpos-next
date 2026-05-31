@@ -1,7 +1,7 @@
 "use client";
 import Main from "@/components/main";
 import { useAgency } from "@/context/AgencyContext";
-import { useSearch } from "@/context/SearchContext";
+import { SearchState, useSearch } from "@/context/SearchContext";
 import { useTracking } from "@/context/TrackingContext";
 import { Agency } from "@/types/agency";
 import { Box, Center, Image, Link, Text } from "@chakra-ui/react";
@@ -17,7 +17,7 @@ export default function Home() {
   });
 
   const { searchAgencies, setSearchAgencies } = useAgency();
-  const { state } = useSearch();
+  const { state, setState } = useSearch();
   const { trackingVehicleId, setTrackingVehicleId } = useTracking();
   const searchParams = useSearchParams();
 
@@ -51,6 +51,30 @@ export default function Home() {
       setTrackingVehicleId(trackingVehicle);
     }
   }, [trackingVehicle, setTrackingVehicleId]);
+
+  // クエリパラメータから検索状態を復元
+  useEffect(() => {
+    const keys = [
+      "search_vehicle",
+      "from_stop",
+      "via_stop",
+      "to_stop",
+      "route",
+    ] as const;
+
+    const restored: Partial<SearchState> = {};
+    for (const key of keys) {
+      const value = searchParams.get(key);
+      if (value) {
+        restored[key] = value;
+      }
+    }
+
+    if (Object.keys(restored).length > 0) {
+      setState({ ...state, ...restored });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // クエリパラメータの変更をURLに反映
   useEffect(() => {
