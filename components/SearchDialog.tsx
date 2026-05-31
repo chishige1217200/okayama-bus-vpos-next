@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { useSearch } from "@/context/SearchContext";
 import AutoCompleteInput from "./AutoCompleteInput";
-import { useDebounce } from "@/hooks/useDebounce";
+// import { useDebounce } from "@/hooks/useDebounce";
 import { useAgency } from "@/context/AgencyContext";
 import { Agency, availableAgencies, getAgencyName } from "@/types/agency";
 import { useStaticData } from "@/context/StaticDataContext";
@@ -45,7 +45,7 @@ export default function SearchForm() {
   }, [routesList]);
 
   // ⭐ debounce
-  const debounced = useDebounce(state, 300);
+  // const debounced = useDebounce(state, 300);
 
   // useEffect(() => {
   //   onSearch?.(); // 自動検索したい場合
@@ -104,6 +104,7 @@ export default function SearchForm() {
               value={state.route}
               placeholder="路線"
               options={routeOptions}
+              listWidth="220%"
               onChange={(v) => setState({ ...state, route: v })}
             />
           </Field.Root>

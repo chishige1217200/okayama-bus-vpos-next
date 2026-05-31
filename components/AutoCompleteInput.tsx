@@ -15,6 +15,7 @@ type Props = {
   onChange: (v: string) => void;
   placeholder: string;
   options: string[];
+  listWidth?: string;
 };
 
 export default function AutoCompleteInput({
@@ -22,6 +23,7 @@ export default function AutoCompleteInput({
   onChange,
   placeholder,
   options,
+  listWidth,
 }: Props) {
   const [open, setOpen] = useState(false);
 
@@ -49,8 +51,9 @@ export default function AutoCompleteInput({
       {open && filtered.length > 0 && (
         <List.Root
           position="absolute"
+          top="100%"
           bg="black"
-          w="100%"
+          w={listWidth ?? "110%"}
           mt={1}
           borderRadius="md"
           boxShadow="md"

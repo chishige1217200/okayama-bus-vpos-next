@@ -221,8 +221,8 @@ const Main = () => {
                 modal={false}
                 open={isDialogOpen}
                 onOpenChange={(e) => setIsDialogOpen(e.open)}
-                placement={"bottom"}
-                motionPreset={"slide-in-bottom"}
+                placement={"top"}
+                motionPreset={"slide-in-top"}
               >
                 <Portal>
                   <Dialog.Backdrop />
