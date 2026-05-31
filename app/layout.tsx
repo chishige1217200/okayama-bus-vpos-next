@@ -8,6 +8,7 @@ import { SearchProvider } from "@/context/SearchContext";
 import { TrackingProvider } from "@/context/TrackingContext";
 import { Provider } from "@/components/ui/provider";
 import { Toaster } from "@/components/ui/toaster";
+import { StaticDataProvider } from "@/context/StaticDataContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,14 +39,16 @@ export default function RootLayout({
         <Suspense>
           <Provider>
             <AgencyProvider>
-              <FetchProvider>
-                <TrackingProvider>
-                  <SearchProvider>
-                    <Toaster />
-                    {children}
-                  </SearchProvider>
-                </TrackingProvider>
-              </FetchProvider>
+              <StaticDataProvider>
+                <FetchProvider>
+                  <TrackingProvider>
+                    <SearchProvider>
+                      <Toaster />
+                      {children}
+                    </SearchProvider>
+                  </TrackingProvider>
+                </FetchProvider>
+              </StaticDataProvider>
             </AgencyProvider>
           </Provider>
         </Suspense>
