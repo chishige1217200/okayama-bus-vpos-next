@@ -6,7 +6,7 @@ import { useTracking } from "@/context/TrackingContext";
 import { Agency } from "@/types/agency";
 import { Box, Center, Image, Link, Text } from "@chakra-ui/react";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 const STORAGE_KEY = "termsAgreed";
 
@@ -21,58 +21,46 @@ export default function Home() {
   const { trackingVehicleId, setTrackingVehicleId } = useTracking();
   const searchParams = useSearchParams();
 
-  // クエリパラメータの解析
-  // 現在システムで利用可能な事業者はagency.tsを参照
-  const [okaden] = useState<boolean>(() => {
-    return Boolean(searchParams.get("okaden")?.toLowerCase() !== "false");
-  });
-  const [ryobi] = useState<boolean>(() => {
-    return Boolean(searchParams.get("ryobi")?.toLowerCase() !== "false");
-  });
-  const [hakkou] = useState<boolean>(() => {
-    return Boolean(searchParams.get("hakkou")?.toLowerCase() !== "false");
-  });
-  const trackingVehicle = searchParams.get("tracking_vehicle") || undefined;
-
-  const agencyArray = useMemo(() => {
-    const array: Agency[] = [];
-    if (okaden) array.push(Agency.OKADEN);
-    if (ryobi) array.push(Agency.RYOBI);
-    if (hakkou) array.push(Agency.HAKKOU);
-    return array;
-  }, [okaden, ryobi, hakkou]);
-
+  // クエリパラメータを各Contextに反映（初回のみ）
   useEffect(() => {
-    setSearchAgencies(agencyArray);
-  }, [agencyArray, setSearchAgencies]);
-
-  useEffect(() => {
-    if (trackingVehicle) {
-      setTrackingVehicleId(trackingVehicle);
+    // 事業者
+    const agencies: Agency[] = [];
+    if (searchParams.get("okaden")?.toLowerCase() !== "false") {
+      agencies.push(Agency.OKADEN);
     }
-  }, [trackingVehicle, setTrackingVehicleId]);
+    if (searchParams.get("ryobi")?.toLowerCase() !== "false") {
+      agencies.push(Agency.RYOBI);
+    }
+    if (searchParams.get("hakkou")?.toLowerCase() !== "false") {
+      agencies.push(Agency.HAKKOU);
+    }
+    setSearchAgencies(agencies);
 
-  // クエリパラメータから検索状態を復元
-  useEffect(() => {
-    const keys = [
+    // 検索状態
+    const searchKeys = [
       "search_vehicle",
       "from_stop",
       "via_stop",
       "to_stop",
       "route",
     ] as const;
-
     const restored: Partial<SearchState> = {};
-    for (const key of keys) {
+    for (const key of searchKeys) {
       const value = searchParams.get(key);
       if (value) {
         restored[key] = value;
       }
     }
-
     if (Object.keys(restored).length > 0) {
       setState({ ...state, ...restored });
     }
+
+    // 追跡対象
+    const trackingVehicle = searchParams.get("tracking_vehicle");
+    if (trackingVehicle) {
+      setTrackingVehicleId(trackingVehicle);
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
