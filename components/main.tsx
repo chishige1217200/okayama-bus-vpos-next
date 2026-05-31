@@ -38,7 +38,12 @@ const Main = () => {
   };
 
   const deactivateFullscreen = async () => {
-    await document.exitFullscreen();
+    if (!document.fullscreenElement) return;
+    try {
+      await document.exitFullscreen();
+    } catch {
+      // Document not active などのエラーを無視
+    }
   };
 
   useEffect(() => {
