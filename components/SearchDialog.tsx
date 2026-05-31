@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import {
   VStack,
   CheckboxGroup,
@@ -11,19 +12,40 @@ import {
 } from "@chakra-ui/react";
 import { useSearch } from "@/context/SearchContext";
 import AutoCompleteInput from "./AutoCompleteInput";
-import { useDebounce } from "@/hooks/useDebounce";
+// import { useDebounce } from "@/hooks/useDebounce";
 import { useAgency } from "@/context/AgencyContext";
 import { Agency, availableAgencies, getAgencyName } from "@/types/agency";
-
-const stopOptions = ["岡山駅", "天満屋", "表町"]; // ← 実データに置換
-const routeOptions = ["1系統", "2系統"];
+import { useStaticData } from "@/context/StaticDataContext";
 
 export default function SearchForm() {
   const { searchAgencies, setSearchAgencies } = useAgency();
   const { state, setState, clear } = useSearch();
+  const { routesList, stopsList } = useStaticData();
+
+  const stopOptions = useMemo(() => {
+    if (!stopsList) return [];
+    return Array.from(
+      new Set(
+        stopsList
+          .map((s) => s.stop_name.trim())
+          .filter(Boolean)
+      )
+    ).sort();
+  }, [stopsList]);
+
+  const routeOptions = useMemo(() => {
+    if (!routesList) return [];
+    return Array.from(
+      new Set(
+        routesList
+          .map((r) => (r.route_short_name.replace(/(\s|_)/g, " ") || r.route_long_name).trim())
+          .filter(Boolean)
+      )
+    ).sort();
+  }, [routesList]);
 
   // ⭐ debounce
-  const debounced = useDebounce(state, 300);
+  // const debounced = useDebounce(state, 300);
 
   // useEffect(() => {
   //   onSearch?.(); // 自動検索したい場合
@@ -82,6 +104,7 @@ export default function SearchForm() {
               value={state.route}
               placeholder="路線"
               options={routeOptions}
+              listWidth="220%"
               onChange={(v) => setState({ ...state, route: v })}
             />
           </Field.Root>

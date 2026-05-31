@@ -38,7 +38,12 @@ const Main = () => {
   };
 
   const deactivateFullscreen = async () => {
-    await document.exitFullscreen();
+    if (!document.fullscreenElement) return;
+    try {
+      await document.exitFullscreen();
+    } catch {
+      // Document not active などのエラーを無視
+    }
   };
 
   useEffect(() => {
@@ -221,8 +226,8 @@ const Main = () => {
                 modal={false}
                 open={isDialogOpen}
                 onOpenChange={(e) => setIsDialogOpen(e.open)}
-                placement={"bottom"}
-                motionPreset={"slide-in-bottom"}
+                placement={"top"}
+                motionPreset={"slide-in-top"}
               >
                 <Portal>
                   <Dialog.Backdrop />

@@ -1,5 +1,7 @@
 import { useFetchController } from "@/context/FetchContext";
+import { useSearch } from "@/context/SearchContext";
 import { useTracking } from "@/context/TrackingContext";
+import { useStaticData } from "@/context/StaticDataContext";
 import {
   Agency,
   getVehicleStateUrl,
@@ -29,6 +31,8 @@ type MarkerGroupProps = {
 
 // 事業者毎に運行情報の取得を行う
 const MarkerGroup = (props: MarkerGroupProps) => {
+  const { fetchStaticData } = useStaticData();
+
   const fetchTripUpdate = async (agency: Agency) => {
     const response = await fetch(`/api/get_trip_update/?agency=${agency}`);
 
@@ -49,55 +53,6 @@ const MarkerGroup = (props: MarkerGroupProps) => {
     // 通信エラー発生時は前の状態を維持する
   };
 
-  const fetchRoutes = async (agency: Agency) => {
-    const response = await fetch(`/api/get_routes/?agency=${agency}`);
-    if (response.ok) {
-      const data = await response.json();
-      setRoutesList(data);
-    } else {
-      setRoutesList([]);
-    }
-  };
-
-  const fetchRoutesJp = async (agency: Agency) => {
-    const response = await fetch(`/api/get_routes_jp/?agency=${agency}`);
-    if (response.ok) {
-      const data = await response.json();
-      setRoutesJpList(data);
-    } else {
-      setRoutesJpList([]);
-    }
-  };
-
-  const fetchStops = async (agency: Agency) => {
-    const response = await fetch(`/api/get_stops/?agency=${agency}`);
-    if (response.ok) {
-      const data = await response.json();
-      setStopsList(data);
-    } else {
-      setStopsList([]);
-    }
-  };
-
-  const fetchIcon = async (agency: Agency) => {
-    const response = await fetch(`/api/get_icon/?agency=${agency}`);
-    if (response.ok) {
-      const data = await response.json();
-      setIconList(data);
-    } else {
-      setIconList([]);
-    }
-  };
-
-  const fetchStaticData = useCallback(async (agency: Agency) => {
-    await Promise.all([
-      fetchRoutes(agency),
-      fetchRoutesJp(agency),
-      fetchStops(agency),
-      fetchIcon(agency),
-    ]);
-  }, []);
-
   const fetchRealtimeData = useCallback(async (agency: Agency) => {
     await Promise.all([fetchTripUpdate(agency), fetchVposUpdate(agency)]);
   }, []);
@@ -112,10 +67,6 @@ const MarkerGroup = (props: MarkerGroupProps) => {
   const [vposUpdateList, setVposUpdateList] = useState<VposUpdate[] | null>(
     null,
   );
-  const [routesList, setRoutesList] = useState<Routes[] | null>(null);
-  const [routesJpList, setRoutesJpList] = useState<RoutesJp[] | null>(null);
-  const [stopsList, setStopsList] = useState<Stops[] | null>(null);
-  const [iconList, setIconList] = useState<Icon[] | null>(null);
 
   // 初回フェッチ（事業者変更時もフェッチするが、基本発生しない）
   useEffect(() => {
@@ -175,10 +126,6 @@ const MarkerGroup = (props: MarkerGroupProps) => {
                     : null
                 }
                 vpos={vpos}
-                routes={routesList}
-                routesJp={routesJpList}
-                stops={stopsList}
-                icon={iconList}
                 zIndex={Number(props.agency) * 100 + index}
               />
             </React.Fragment>
@@ -192,16 +139,19 @@ type MarkerProps = {
   agency: Agency;
   trip: TripUpdate | null;
   vpos: VposUpdate | null;
-  routes: Routes[] | null;
-  routesJp: RoutesJp[] | null;
-  stops: Stops[] | null;
-  icon: Icon[] | null;
   zIndex: number;
 };
 
 // 共通のマーカーコンポーネント
 const Marker = (props: MarkerProps) => {
   const { trackingVehicleId, setTrackingVehicleId } = useTracking();
+  const { staticData } = useStaticData();
+  const { state: searchState } = useSearch();
+  const agencyData = staticData[props.agency] || {};
+  const routesList = agencyData.routesList ?? null;
+  const routesJpList = agencyData.routesJpList ?? null;
+  const stopsList = agencyData.stopsList ?? null;
+  const iconList = agencyData.iconList ?? null;
 
   const isMobile = useBreakpointValue({ base: true, md: false });
 
@@ -216,8 +166,8 @@ const Marker = (props: MarkerProps) => {
   };
 
   const getRouteShortName = (): string => {
-    if (props.routes && props.vpos) {
-      const routes = props.routes.find(
+    if (routesList && props.vpos) {
+      const routes = routesList.find(
         (r) => r.route_id === props.vpos?.vehicle.trip.routeId,
       );
 
@@ -238,8 +188,8 @@ const Marker = (props: MarkerProps) => {
 
   const getDestinationStopName = (): string => {
     if (props.agency === Agency.HAKKOU) {
-      if (props.routes && props.vpos) {
-        const routes = props.routes.find(
+      if (routesList && props.vpos) {
+        const routes = routesList.find(
           (r) => r.route_id === props.vpos?.vehicle.trip.routeId,
         );
 
@@ -247,8 +197,8 @@ const Marker = (props: MarkerProps) => {
         return destinationStopName;
       }
     } else {
-      if (props.routesJp && props.vpos) {
-        const routesJp = props.routesJp.find(
+      if (routesJpList && props.vpos) {
+        const routesJp = routesJpList.find(
           (r) => r.route_id === props.vpos?.vehicle.trip.routeId,
         );
 
@@ -262,7 +212,7 @@ const Marker = (props: MarkerProps) => {
   };
 
   const getNextStopName = (): JSX.Element => {
-    if (props.stops && props.trip && props.vpos) {
+    if (stopsList && props.trip && props.vpos) {
       // 現在のstopSequenceのインデックスを取得
       // stopSequenceと配列の添字が必ずしも一致しないことに注意する
       const currentIndex = props.trip.tripUpdate.stopTimeUpdate.findIndex(
@@ -275,7 +225,7 @@ const Marker = (props: MarkerProps) => {
         currentIndex + 1 < props.trip.tripUpdate.stopTimeUpdate.length
       ) {
         const stopName =
-          props.stops.find(
+          stopsList.find(
             (s) =>
               s.stop_id ===
               props.trip?.tripUpdate.stopTimeUpdate[currentIndex + 1].stopId,
@@ -293,7 +243,7 @@ const Marker = (props: MarkerProps) => {
 
       // 次のインデックスが存在しない場合は、現在のstopNameを返す
       const stopName =
-        props.stops.find(
+        stopsList.find(
           (s) =>
             s.stop_id ===
             props.trip?.tripUpdate.stopTimeUpdate[currentIndex].stopId,
@@ -380,14 +330,84 @@ const Marker = (props: MarkerProps) => {
   };
 
   const getIcon = (): string => {
-    if (props.icon && props.vpos) {
-      const icon = props.icon.find(
+    if (iconList && props.vpos) {
+      const icon = iconList.find(
         (icon) => icon.label === props.vpos?.vehicle.vehicle.label,
       );
       return icon?.url ?? "/unknown.png";
     }
     return "/unknown.png";
   };
+
+  const shouldShow = (): boolean => {
+    const { search_vehicle, route, from_stop, via_stop, to_stop } = searchState;
+
+    if (!search_vehicle && !route && !from_stop && !via_stop && !to_stop) {
+      return true;
+    }
+
+    if (search_vehicle) {
+      const label = getLabel();
+      if (!label.toLowerCase().includes(search_vehicle.toLowerCase())) {
+        return false;
+      }
+    }
+
+    if (route) {
+      const routeShortName = getRouteShortName();
+      if (routesList && props.vpos) {
+        const matchedRoute = routesList.find(
+          (r) => r.route_id === props.vpos?.vehicle.trip.routeId,
+        );
+        const routeLongName = matchedRoute?.route_long_name ?? "";
+        if (
+          !routeShortName.toLowerCase().includes(route.toLowerCase()) &&
+          !routeLongName.toLowerCase().includes(route.toLowerCase())
+        ) {
+          return false;
+        }
+      } else if (!routeShortName.toLowerCase().includes(route.toLowerCase())) {
+        return false;
+      }
+    }
+
+    if (from_stop || via_stop || to_stop) {
+      if (!stopsList || !props.trip) return false;
+
+      const stopNames = props.trip.tripUpdate.stopTimeUpdate.map(
+        (st) => stopsList.find((s) => s.stop_id === st.stopId)?.stop_name ?? "",
+      );
+
+      if (from_stop && stopNames.length > 0) {
+        if (
+          !stopNames[0].toLowerCase().includes(from_stop.toLowerCase())
+        ) {
+          return false;
+        }
+      }
+
+      if (to_stop && stopNames.length > 0) {
+        if (
+          !stopNames[stopNames.length - 1]
+            .toLowerCase()
+            .includes(to_stop.toLowerCase())
+        ) {
+          return false;
+        }
+      }
+
+      if (via_stop) {
+        const hasViaStop = stopNames.some((name) =>
+          name.toLowerCase().includes(via_stop.toLowerCase()),
+        );
+        if (!hasViaStop) return false;
+      }
+    }
+
+    return true;
+  };
+
+  if (!shouldShow()) return null;
 
   return (
     <>

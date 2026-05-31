@@ -1,11 +1,12 @@
 "use client";
 import Main from "@/components/main";
 import { useAgency } from "@/context/AgencyContext";
+import { SearchState, useSearch } from "@/context/SearchContext";
 import { useTracking } from "@/context/TrackingContext";
 import { Agency } from "@/types/agency";
 import { Box, Center, Image, Link, Text } from "@chakra-ui/react";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 const STORAGE_KEY = "termsAgreed";
 
@@ -15,34 +16,78 @@ export default function Home() {
     return Boolean(localStorage.getItem(STORAGE_KEY));
   });
 
-  const { setSearchAgencies } = useAgency();
-  const { setTrackingVehicleId } = useTracking();
+  const { searchAgencies, setSearchAgencies } = useAgency();
+  const { state, setState } = useSearch();
+  const { trackingVehicleId, setTrackingVehicleId } = useTracking();
   const searchParams = useSearchParams();
 
-  // クエリパラメータの解析
-  // 現在システムで利用可能な事業者はagency.tsを参照
-  const okaden = Boolean(searchParams.get("okaden")?.toLowerCase() !== "false");
-  const ryobi = Boolean(searchParams.get("ryobi")?.toLowerCase() !== "false");
-  const hakkou = Boolean(searchParams.get("hakkou")?.toLowerCase() !== "false");
-  const trackingVehicle = searchParams.get("tracking_vehicle") || undefined;
-
-  const agencyArray = useMemo(() => {
-    const array: Agency[] = [];
-    if (okaden) array.push(Agency.OKADEN);
-    if (ryobi) array.push(Agency.RYOBI);
-    if (hakkou) array.push(Agency.HAKKOU);
-    return array;
-  }, [okaden, ryobi, hakkou]);
-
+  // クエリパラメータを各Contextに反映（初回のみ）
   useEffect(() => {
-    setSearchAgencies(agencyArray);
-  }, [agencyArray, setSearchAgencies]);
+    // 事業者
+    const agencies: Agency[] = [];
+    if (searchParams.get("okaden")?.toLowerCase() !== "false") {
+      agencies.push(Agency.OKADEN);
+    }
+    if (searchParams.get("ryobi")?.toLowerCase() !== "false") {
+      agencies.push(Agency.RYOBI);
+    }
+    if (searchParams.get("hakkou")?.toLowerCase() !== "false") {
+      agencies.push(Agency.HAKKOU);
+    }
+    setSearchAgencies(agencies);
 
-  useEffect(() => {
+    // 検索状態
+    const searchKeys = [
+      "search_vehicle",
+      "from_stop",
+      "via_stop",
+      "to_stop",
+      "route",
+    ] as const;
+    const restored: Partial<SearchState> = {};
+    for (const key of searchKeys) {
+      const value = searchParams.get(key);
+      if (value) {
+        restored[key] = value;
+      }
+    }
+    if (Object.keys(restored).length > 0) {
+      setState({ ...state, ...restored });
+    }
+
+    // 追跡対象
+    const trackingVehicle = searchParams.get("tracking_vehicle");
     if (trackingVehicle) {
       setTrackingVehicleId(trackingVehicle);
     }
-  }, [trackingVehicle, setTrackingVehicleId]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // クエリパラメータの変更をURLに反映
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    Object.entries({
+      okaden: searchAgencies.includes(Agency.OKADEN) ? "true" : "false",
+      ryobi: searchAgencies.includes(Agency.RYOBI) ? "true" : "false",
+      hakkou: searchAgencies.includes(Agency.HAKKOU) ? "true" : "false",
+    }).forEach(([key, value]) => {
+      params.set(key, value);
+    });
+
+    Object.entries(state).forEach(([key, value]) => {
+      if (value) {
+        params.set(key, value);
+      }
+    });
+
+    if (trackingVehicleId) {
+      params.set("tracking_vehicle", trackingVehicleId);
+    }
+
+    window.history.replaceState(null, "", `?${params.toString()}`);
+  }, [searchAgencies, state, trackingVehicleId]);
 
   return agreed ? (
     <Main />
