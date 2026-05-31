@@ -68,18 +68,18 @@ export default function Home() {
   useEffect(() => {
     const params = new URLSearchParams();
 
-    Object.entries(state).forEach(([key, value]) => {
-      if (value) {
-        params.set(key, value);
-      }
-    });
-
     Object.entries({
       okaden: searchAgencies.includes(Agency.OKADEN) ? "true" : "false",
       ryobi: searchAgencies.includes(Agency.RYOBI) ? "true" : "false",
       hakkou: searchAgencies.includes(Agency.HAKKOU) ? "true" : "false",
     }).forEach(([key, value]) => {
       params.set(key, value);
+    });
+
+    Object.entries(state).forEach(([key, value]) => {
+      if (value) {
+        params.set(key, value);
+      }
     });
 
     if (trackingVehicleId) {
