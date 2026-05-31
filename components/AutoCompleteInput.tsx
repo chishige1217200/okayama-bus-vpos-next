@@ -11,6 +11,7 @@ import {
 import { useMemo, useState } from "react";
 
 type Props = {
+  name: string;
   value: string;
   onChange: (v: string) => void;
   placeholder: string;
@@ -19,6 +20,7 @@ type Props = {
 };
 
 export default function AutoCompleteInput({
+  name,
   value,
   onChange,
   placeholder,
@@ -36,6 +38,7 @@ export default function AutoCompleteInput({
     <Box position="relative" className="flex items-center">
       <InputGroup endElement={<CloseButton onClick={() => onChange("")} />}>
         <Input
+          name={name}
           value={value}
           placeholder={placeholder}
           bg="blackAlpha.300"

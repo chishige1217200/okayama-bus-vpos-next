@@ -91,6 +91,7 @@ export default function SearchForm() {
           <Field.Root>
             <Field.Label>号車</Field.Label>
             <AutoCompleteInput
+              name="search_vehicle"
               value={state.search_vehicle}
               placeholder="号車検索"
               options={[]}
@@ -101,6 +102,7 @@ export default function SearchForm() {
           <Field.Root>
             <Field.Label>路線</Field.Label>
             <AutoCompleteInput
+              name="route"
               value={state.route}
               placeholder="路線"
               options={routeOptions}
@@ -114,6 +116,7 @@ export default function SearchForm() {
           <Field.Root>
             <Field.Label>始点</Field.Label>
             <AutoCompleteInput
+              name="from_stop"
               value={state.from_stop}
               placeholder="始点"
               options={stopOptions}
@@ -124,6 +127,7 @@ export default function SearchForm() {
           <Field.Root>
             <Field.Label>経由点</Field.Label>
             <AutoCompleteInput
+              name="via_stop"
               value={state.via_stop}
               placeholder="経由点"
               options={stopOptions}
@@ -134,6 +138,7 @@ export default function SearchForm() {
           <Field.Root>
             <Field.Label>終点</Field.Label>
             <AutoCompleteInput
+              name="to_stop"
               value={state.to_stop}
               placeholder="終点"
               options={stopOptions}
