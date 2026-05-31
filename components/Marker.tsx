@@ -1,4 +1,5 @@
 import { useFetchController } from "@/context/FetchContext";
+import { useSearch } from "@/context/SearchContext";
 import { useTracking } from "@/context/TrackingContext";
 import { useStaticData } from "@/context/StaticDataContext";
 import {
@@ -145,6 +146,7 @@ type MarkerProps = {
 const Marker = (props: MarkerProps) => {
   const { trackingVehicleId, setTrackingVehicleId } = useTracking();
   const { staticData } = useStaticData();
+  const { state: searchState } = useSearch();
   const agencyData = staticData[props.agency] || {};
   const routesList = agencyData.routesList ?? null;
   const routesJpList = agencyData.routesJpList ?? null;
@@ -336,6 +338,76 @@ const Marker = (props: MarkerProps) => {
     }
     return "/unknown.png";
   };
+
+  const shouldShow = (): boolean => {
+    const { search_vehicle, route, from_stop, via_stop, to_stop } = searchState;
+
+    if (!search_vehicle && !route && !from_stop && !via_stop && !to_stop) {
+      return true;
+    }
+
+    if (search_vehicle) {
+      const label = getLabel();
+      if (!label.toLowerCase().includes(search_vehicle.toLowerCase())) {
+        return false;
+      }
+    }
+
+    if (route) {
+      const routeShortName = getRouteShortName();
+      if (routesList && props.vpos) {
+        const matchedRoute = routesList.find(
+          (r) => r.route_id === props.vpos?.vehicle.trip.routeId,
+        );
+        const routeLongName = matchedRoute?.route_long_name ?? "";
+        if (
+          !routeShortName.toLowerCase().includes(route.toLowerCase()) &&
+          !routeLongName.toLowerCase().includes(route.toLowerCase())
+        ) {
+          return false;
+        }
+      } else if (!routeShortName.toLowerCase().includes(route.toLowerCase())) {
+        return false;
+      }
+    }
+
+    if (from_stop || via_stop || to_stop) {
+      if (!stopsList || !props.trip) return false;
+
+      const stopNames = props.trip.tripUpdate.stopTimeUpdate.map(
+        (st) => stopsList.find((s) => s.stop_id === st.stopId)?.stop_name ?? "",
+      );
+
+      if (from_stop && stopNames.length > 0) {
+        if (
+          !stopNames[0].toLowerCase().includes(from_stop.toLowerCase())
+        ) {
+          return false;
+        }
+      }
+
+      if (to_stop && stopNames.length > 0) {
+        if (
+          !stopNames[stopNames.length - 1]
+            .toLowerCase()
+            .includes(to_stop.toLowerCase())
+        ) {
+          return false;
+        }
+      }
+
+      if (via_stop) {
+        const hasViaStop = stopNames.some((name) =>
+          name.toLowerCase().includes(via_stop.toLowerCase()),
+        );
+        if (!hasViaStop) return false;
+      }
+    }
+
+    return true;
+  };
+
+  if (!shouldShow()) return null;
 
   return (
     <>
