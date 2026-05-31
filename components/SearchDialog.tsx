@@ -24,14 +24,22 @@ export default function SearchForm() {
 
   const stopOptions = useMemo(() => {
     if (!stopsList) return [];
-    return Array.from(new Set(stopsList.map((s) => s.stop_name))).sort();
+    return Array.from(
+      new Set(
+        stopsList
+          .map((s) => s.stop_name.trim())
+          .filter(Boolean)
+      )
+    ).sort();
   }, [stopsList]);
 
   const routeOptions = useMemo(() => {
     if (!routesList) return [];
     return Array.from(
       new Set(
-        routesList.map((r) => r.route_short_name.replace(/(\s|_)/g, " ") || r.route_long_name)
+        routesList
+          .map((r) => (r.route_short_name.replace(/(\s|_)/g, " ") || r.route_long_name).trim())
+          .filter(Boolean)
       )
     ).sort();
   }, [routesList]);

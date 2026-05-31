@@ -3,6 +3,7 @@
 import { Agency } from "@/types/agency";
 import { Routes, RoutesJp, Stops } from "@/types/gtfsFeed";
 import { Icon } from "@/types/icon";
+import { useAgency } from "@/context/AgencyContext";
 import React, {
   createContext,
   useContext,
@@ -31,6 +32,7 @@ type StaticDataContextType = {
 const StaticDataContext = createContext<StaticDataContextType | null>(null);
 
 export function StaticDataProvider({ children }: { children: React.ReactNode }) {
+  const { searchAgencies } = useAgency();
   const [staticData, setStaticData] = useState<Record<string, StaticData>>({});
   const fetchedOrFetching = useRef<Record<string, boolean>>({});
 
@@ -84,35 +86,39 @@ export function StaticDataProvider({ children }: { children: React.ReactNode }) 
 
   const routesList = useMemo(() => {
     const list: Routes[] = [];
-    Object.values(staticData).forEach((data) => {
-      if (data.routesList) list.push(...data.routesList);
+    searchAgencies.forEach((agency) => {
+      const data = staticData[agency];
+      if (data && data.routesList) list.push(...data.routesList);
     });
     return list.length > 0 ? list : null;
-  }, [staticData]);
+  }, [staticData, searchAgencies]);
 
   const routesJpList = useMemo(() => {
     const list: RoutesJp[] = [];
-    Object.values(staticData).forEach((data) => {
-      if (data.routesJpList) list.push(...data.routesJpList);
+    searchAgencies.forEach((agency) => {
+      const data = staticData[agency];
+      if (data && data.routesJpList) list.push(...data.routesJpList);
     });
     return list.length > 0 ? list : null;
-  }, [staticData]);
+  }, [staticData, searchAgencies]);
 
   const stopsList = useMemo(() => {
     const list: Stops[] = [];
-    Object.values(staticData).forEach((data) => {
-      if (data.stopsList) list.push(...data.stopsList);
+    searchAgencies.forEach((agency) => {
+      const data = staticData[agency];
+      if (data && data.stopsList) list.push(...data.stopsList);
     });
     return list.length > 0 ? list : null;
-  }, [staticData]);
+  }, [staticData, searchAgencies]);
 
   const iconList = useMemo(() => {
     const list: Icon[] = [];
-    Object.values(staticData).forEach((data) => {
-      if (data.iconList) list.push(...data.iconList);
+    searchAgencies.forEach((agency) => {
+      const data = staticData[agency];
+      if (data && data.iconList) list.push(...data.iconList);
     });
     return list.length > 0 ? list : null;
-  }, [staticData]);
+  }, [staticData, searchAgencies]);
 
   const value = useMemo(
     () => ({

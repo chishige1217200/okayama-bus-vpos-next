@@ -26,8 +26,8 @@ export default function AutoCompleteInput({
   const [open, setOpen] = useState(false);
 
   const filtered = useMemo(() => {
-    if (!value) return options.slice(0, 10);
-    return options.filter((o) => o.includes(value)).slice(0, 10);
+    if (!value) return [];
+    return options.filter((o) => o.includes(value)).slice(0, 100);
   }, [value, options]);
 
   return (
