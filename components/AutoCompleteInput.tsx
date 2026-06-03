@@ -1,5 +1,6 @@
 "use client";
 
+import { useColorModeValue } from "@/components/ui/color-mode";
 import {
   Box,
   CloseButton,
@@ -28,6 +29,9 @@ export default function AutoCompleteInput({
   listWidth,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const listBg = useColorModeValue("white", "gray.800");
+  const listItemHoverBg = useColorModeValue("gray.100", "gray.700");
+  const listItemColor = useColorModeValue("black", "white");
 
   const filtered = useMemo(() => {
     if (!value) return [];
@@ -36,12 +40,15 @@ export default function AutoCompleteInput({
 
   return (
     <Box position="relative" className="flex items-center">
-      <InputGroup endElement={<CloseButton onClick={() => onChange("")} />}>
+      <InputGroup
+        endElement={<CloseButton onClick={() => onChange("")} />}
+        endElementProps={{ paddingInline: 0 }}
+      >
         <Input
           name={name}
           value={value}
           placeholder={placeholder}
-          bg="blackAlpha.300"
+          bg={listBg}
           onChange={(e) => {
             onChange(e.target.value);
             setOpen(true);
@@ -55,7 +62,8 @@ export default function AutoCompleteInput({
         <List.Root
           position="absolute"
           top="100%"
-          bg="black"
+          bg={listBg}
+          color={listItemColor}
           w={listWidth ?? "110%"}
           mt={1}
           borderRadius="md"
@@ -70,7 +78,7 @@ export default function AutoCompleteInput({
               px={3}
               py={2}
               cursor="pointer"
-              _hover={{ bg: "gray.700" }}
+              _hover={{ bg: listItemHoverBg }}
               onMouseDown={() => onChange(item)}
             >
               {item}
