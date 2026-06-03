@@ -153,7 +153,7 @@ const Marker = (props: MarkerProps) => {
   const stopsList = agencyData.stopsList ?? null;
   const iconList = agencyData.iconList ?? null;
 
-  const isMobile = useBreakpointValue({ base: true, md: false });
+  // const isMobile = useBreakpointValue({ base: true, md: false });
 
   const getPosition = (): google.maps.LatLngLiteral => {
     if (props.vpos) {
@@ -174,8 +174,8 @@ const Marker = (props: MarkerProps) => {
       // _は半角空白に変換する
       let routeShortName =
         routes?.route_short_name.replace(/(\s|_)/g, " ") ?? "";
-      // モバイル端末の場合、改行を行い見やすくする
-      if (isMobile && routeShortName.length > 20) {
+      // 改行を行い見やすくする
+      if (routeShortName.length > 20) {
         routeShortName = routeShortName.replaceAll("→", "\n↓\n");
       }
 
