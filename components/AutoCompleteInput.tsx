@@ -45,7 +45,7 @@ export default function AutoCompleteInput({
           name={name}
           value={value}
           placeholder={placeholder}
-          bg="blackAlpha.300"
+          bg={listBg}
           onChange={(e) => {
             onChange(e.target.value);
             setOpen(true);
