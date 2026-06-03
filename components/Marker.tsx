@@ -220,42 +220,44 @@ const Marker = (props: MarkerProps) => {
       );
 
       // 次のインデックスが存在する場合は、stopNameを返す
+      let stopName = "";
       if (
         currentIndex !== -1 &&
         currentIndex + 1 < props.trip.tripUpdate.stopTimeUpdate.length
       ) {
-        const stopName =
+        stopName =
           stopsList.find(
             (s) =>
               s.stop_id ===
               props.trip?.tripUpdate.stopTimeUpdate[currentIndex + 1].stopId,
           )?.stop_name ?? "";
-        return (
-          <HStack gap={1} justifyContent="center">
-            <Text fontWeight="normal">{`次は `}</Text>
-            <Text
-              fontWeight="normal"
-              textDecorationLine="underline"
-            >{`${stopName}`}</Text>
-          </HStack>
-        );
+      } else {
+        // 次のインデックスが存在しない場合は、現在のstopNameを返す
+        stopName =
+          stopsList.find(
+            (s) =>
+              s.stop_id ===
+              props.trip?.tripUpdate.stopTimeUpdate[currentIndex].stopId,
+          )?.stop_name ?? "";
       }
 
-      // 次のインデックスが存在しない場合は、現在のstopNameを返す
-      const stopName =
-        stopsList.find(
-          (s) =>
-            s.stop_id ===
-            props.trip?.tripUpdate.stopTimeUpdate[currentIndex].stopId,
-        )?.stop_name ?? "";
+      // 改行を行い見やすくする
+      if (stopName.length > 10) {
+        stopName = stopName.replaceAll("・", "・\n");
+      }
 
       return (
-        <HStack gap={1} justifyContent="center">
-          <Text fontWeight="normal">{`次は `}</Text>
+        <HStack gap={1} justifyContent="center" alignItems="flex-start">
+          <Text fontWeight="normal" whiteSpace="nowrap">
+            次は
+          </Text>
           <Text
             fontWeight="normal"
+            whiteSpace="pre-wrap"
             textDecorationLine="underline"
-          >{`${stopName}`}</Text>
+          >
+            {stopName}
+          </Text>
         </HStack>
       );
     }
@@ -379,9 +381,7 @@ const Marker = (props: MarkerProps) => {
       );
 
       if (from_stop && stopNames.length > 0) {
-        if (
-          !stopNames[0].toLowerCase().includes(from_stop.toLowerCase())
-        ) {
+        if (!stopNames[0].toLowerCase().includes(from_stop.toLowerCase())) {
           return false;
         }
       }
@@ -494,7 +494,12 @@ const Marker = (props: MarkerProps) => {
                     詳しい運行状況
                     <LuExternalLink />
                   </Link>
-                  <CopyLink copyText={getVehicleTrackingParam(props.agency, props.vpos.vehicle.vehicle.id)}>
+                  <CopyLink
+                    copyText={getVehicleTrackingParam(
+                      props.agency,
+                      props.vpos.vehicle.vehicle.id,
+                    )}
+                  >
                     位置情報を共有
                     <LuShare2 />
                   </CopyLink>
