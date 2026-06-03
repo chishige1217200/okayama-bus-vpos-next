@@ -40,7 +40,10 @@ export default function AutoCompleteInput({
 
   return (
     <Box position="relative" className="flex items-center">
-      <InputGroup endElement={<CloseButton onClick={() => onChange("")} />}>
+      <InputGroup
+        endElement={<CloseButton onClick={() => onChange("")} />}
+        endElementProps={{ paddingInline: 0 }}
+      >
         <Input
           name={name}
           value={value}
