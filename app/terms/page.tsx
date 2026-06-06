@@ -23,7 +23,7 @@ export default function TermsPage() {
   // 同意ボタン押下
   const handleAgree = () => {
     localStorage.setItem(STORAGE_KEY, "true");
-    router.push("/");
+    router.push(document.referrer || "/");
   };
 
   const termsText = `　この利用規約は、このウェブサイト上で提供する岡山バス位置情報サービス（以下、「本サービス」と言います。）の利用条件を定めるものです。
