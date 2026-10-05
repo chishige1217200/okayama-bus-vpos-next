@@ -1,2 +1,2 @@
 "feed_publisher_name","feed_publisher_url","feed_lang","feed_start_date","feed_end_date","feed_version"
-"八晃運輸","https://megurin-okayama.com/","ja","20260401","20260903","20260401_20260401"
+"八晃運輸","https://megurin-okayama.com/","ja","20260401","20270309","20260401_20261005"
